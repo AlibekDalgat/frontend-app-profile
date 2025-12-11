@@ -11,14 +11,14 @@ const EDUCATION_LEVELS = [
 ];
 
 const SOCIAL = {
-  linkedin: {
-    title: 'LinkedIn',
+  vk: {
+    title: 'VKontakte',
   },
-  twitter: {
-    title: 'Twitter',
+  telegram: {
+    title: 'Telegram',
   },
-  facebook: {
-    title: 'Facebook',
+  max: {
+    title: 'Max',
   },
 };
 

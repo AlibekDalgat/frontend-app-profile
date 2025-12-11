@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Alert } from '@openedx/paragon';
+import { faMessage } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTwitter, faFacebook, faLinkedin } from '@fortawesome/free-brands-svg-icons';
+import { faTelegram, faVk } from '@fortawesome/free-brands-svg-icons';
 import { FormattedMessage, injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import classNames from 'classnames';
 
@@ -19,17 +20,17 @@ import SwitchContent from './elements/SwitchContent';
 import { editableFormSelector } from '../data/selectors';
 
 const platformDisplayInfo = {
-  facebook: {
-    icon: faFacebook,
-    name: 'Facebook',
+  max: {
+    icon: faMessage,
+    name: 'Max',
   },
-  twitter: {
-    icon: faTwitter,
-    name: 'Twitter',
+  telegram: {
+    icon: faTelegram,
+    name: 'Telegram',
   },
-  linkedin: {
-    icon: faLinkedin,
-    name: 'LinkedIn',
+  vk: {
+    icon: faVk,
+    name: 'VKontakte',
   },
 };
 
@@ -181,7 +182,7 @@ class SocialLinks extends React.Component {
   }
 
   mergeWithDrafts(newSocialLink) {
-    const knownPlatforms = ['twitter', 'facebook', 'linkedin'];
+    const knownPlatforms = ['telegram', 'max', 'vk'];
     const updated = [];
     knownPlatforms.forEach((platform) => {
       if (newSocialLink.platform === platform) {
