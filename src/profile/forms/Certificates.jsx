@@ -96,7 +96,7 @@ class Certificates extends React.Component {
             <p className="small mb-2">
               <FormattedMessage
                 id="profile.certificate.completion.date.label"
-                defaultMessage="Completed on {date}"
+                defaultMessage="Получен {date}"
                 values={{
                   date: <FormattedDate value={new Date(modifiedDate)} />,
                 }}
