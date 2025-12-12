@@ -34,6 +34,9 @@ import UsernameDescription from './UsernameDescription';
 import PageLoading from './PageLoading';
 import Banner from './Banner';
 import LearningGoal from './forms/LearningGoal';
+import City from './forms/City';
+import Position from './forms/Position';
+import CompanyName from './forms/CompanyName';
 
 // Selectors
 import { profilePageSelector } from './data/selectors';
@@ -167,6 +170,12 @@ class ProfilePage extends React.Component {
       name,
       visibilityName,
       country,
+      city,
+      visibilityCity,
+      position,
+      visibilityPosition,
+      companyName,
+      visibilityCompanyName,
       visibilityCountry,
       levelOfEducation,
       visibilityLevelOfEducation,
@@ -213,6 +222,9 @@ class ProfilePage extends React.Component {
     const isCertificatesBlockVisible = isBlockVisible(courseCertificates.length);
     const isNameBlockVisible = isBlockVisible(name);
     const isLocationBlockVisible = isBlockVisible(country);
+    const isCityBlockVisible = isBlockVisible(city);
+    const isPositionBlockVisible = isBlockVisible(position);
+    const isCompanyNameBlockVisible = isBlockVisible(companyName);
 
     return (
       <div className="container-fluid">
@@ -261,6 +273,30 @@ class ProfilePage extends React.Component {
                 country={country}
                 visibilityCountry={visibilityCountry}
                 formId="country"
+                {...commonFormProps}
+              />
+            )}
+            {isCityBlockVisible && (
+              <City
+                city={city}
+                visibilityCity={visibilityCity}
+                formId="city"
+                {...commonFormProps}
+              />
+            )}
+            {isPositionBlockVisible && (
+              <Position
+                position={position}
+                visibilityPosition={visibilityPosition}
+                formId="position"
+                {...commonFormProps}
+              />
+            )}
+            {isCompanyNameBlockVisible && (
+              <CompanyName
+                companyName={companyName}
+                visibilityCompanyName={visibilityCompanyName}
+                formId="companyName"
                 {...commonFormProps}
               />
             )}
@@ -354,6 +390,18 @@ ProfilePage.propTypes = {
   country: PropTypes.string,
   visibilityCountry: PropTypes.string.isRequired,
 
+  // City form data
+  city: PropTypes.string,
+  visibilityCity: PropTypes.string.isRequired,
+
+  // Position form data
+  position: PropTypes.string,
+  visibilityPosition: PropTypes.string.isRequired,
+
+  // Company name form data
+  companyName: PropTypes.string,
+  visibilityCompanyName: PropTypes.string.isRequired,
+
   // Education form data
   levelOfEducation: PropTypes.string,
   visibilityLevelOfEducation: PropTypes.string.isRequired,
@@ -424,6 +472,9 @@ ProfilePage.defaultProps = {
   yearOfBirth: null,
   levelOfEducation: null,
   country: null,
+  city: null,
+  position: null,
+  companyName: null,
   socialLinks: [],
   draftSocialLinksByPlatform: {},
   bio: null,

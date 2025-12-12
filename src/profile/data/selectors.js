@@ -238,6 +238,9 @@ export const visibilitiesSelector = createSelector(
           visibilityLanguageProficiencies: preferences.visibilityLanguageProficiencies || 'all_users',
           visibilityName: preferences.visibilityName || 'all_users',
           visibilitySocialLinks: preferences.visibilitySocialLinks || 'all_users',
+          visibilityCity: preferences.visibilityCity || 'all_users',
+          visibilityPosition: preferences.visibilityPosition || 'all_users',
+          visibilityCompanyName: preferences.visibilityCompanyName || 'all_users',
         };
       case 'private':
         return {
@@ -248,6 +251,9 @@ export const visibilitiesSelector = createSelector(
           visibilityLanguageProficiencies: 'private',
           visibilityName: 'private',
           visibilitySocialLinks: 'private',
+          visibilityCity: 'private',
+          visibilityPosition: 'private',
+          visibilityCompanyName: 'private',
         };
       case 'all_users':
       default:
@@ -263,6 +269,9 @@ export const visibilitiesSelector = createSelector(
           visibilityLanguageProficiencies: 'all_users',
           visibilityName: 'all_users',
           visibilitySocialLinks: 'all_users',
+          visibilityCity: 'all_users',
+          visibilityPosition: 'all_users',
+          visibilityCompanyName: 'all_users',
         };
     }
   },
@@ -291,6 +300,12 @@ export const formValuesSelector = createSelector(
     ),
     country: chooseFormValue(drafts.country, account.country),
     visibilityCountry: chooseFormValue(drafts.visibilityCountry, visibilities.visibilityCountry),
+    city: chooseFormValue(drafts.city, account.city),
+    visibilityCity: chooseFormValue(drafts.visibilityCity, visibilities.visibilityCity),
+    position: chooseFormValue(drafts.position, account.position),
+    visibilityPosition: chooseFormValue(drafts.visibilityPosition, visibilities.visibilityPosition),
+    companyName: chooseFormValue(drafts.companyName, account.companyName),
+    visibilityCompanyName: chooseFormValue(drafts.visibilityCompanyName, visibilities.visibilityCompanyName),
     levelOfEducation: chooseFormValue(drafts.levelOfEducation, account.levelOfEducation),
     visibilityLevelOfEducation: chooseFormValue(
       drafts.visibilityLevelOfEducation,
@@ -351,6 +366,18 @@ export const profilePageSelector = createSelector(
     // Country form data
     country: formValues.country,
     visibilityCountry: formValues.visibilityCountry,
+
+    // City form data
+    city: formValues.city,
+    visibilityCity: formValues.visibilityCity,
+
+    // Position form data
+    position: formValues.position,
+    visibilityPosition: formValues.visibilityPosition,
+
+    // Company name form data
+    companyName: formValues.companyName,
+    visibilityCompanyName: formValues.visibilityCompanyName,
 
     // Education form data
     levelOfEducation: formValues.levelOfEducation,

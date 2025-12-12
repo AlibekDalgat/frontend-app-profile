@@ -81,6 +81,9 @@ export function* handleFetchProfile(action) {
         'visibility.language_proficiencies': 'all_users',
         'visibility.social_links': 'all_users',
         'visibility.time_zone': 'all_users',
+        'visibility.city': 'all_users',
+        'visibility.position': 'all_users',
+        'visibility.company_name': 'all_users',
       });
     }
 
@@ -117,6 +120,8 @@ export function* handleSaveProfile(action) {
       'languageProficiencies',
       'name',
       'socialLinks',
+      'city',
+      'companyName',
     ]);
 
     const preferencesDrafts = pick(drafts, [
@@ -127,7 +132,17 @@ export function* handleSaveProfile(action) {
       'visibilityLanguageProficiencies',
       'visibilityName',
       'visibilitySocialLinks',
+      'visibilityCity',
+      'visibilityPosition',
+      'visibilityCompanyName',
     ]);
+
+    if (accountDrafts.position) {
+      delete accountDrafts.position;
+      if (drafts.visibilityPosition) {
+        preferencesDrafts.visibilityPosition = drafts.visibilityPosition;
+      }
+    }
 
     if (Object.keys(preferencesDrafts).length > 0) {
       preferencesDrafts.accountPrivacy = 'custom';

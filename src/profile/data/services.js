@@ -105,6 +105,9 @@ export async function patchPreferences(username, params) {
     visibility_name: 'visibility.name',
     visibility_social_links: 'visibility.social_links',
     visibility_time_zone: 'visibility.time_zone',
+    visibility_city: 'visibility.city',
+    visibility_position: 'visibility.position',
+    visibility_company_name: 'visibility.company_name',
   });
 
   await getHttpClient().patch(`${getConfig().LMS_BASE_URL}/api/user/v1/preferences/${username}`, processedParams, {
