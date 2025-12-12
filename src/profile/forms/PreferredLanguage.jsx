@@ -5,6 +5,7 @@ import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import { Form } from '@openedx/paragon';
 
 import messages from './PreferredLanguage.messages';
+import { getTranslatedLanguageName } from '../../utils/languageTranslations';
 
 // Components
 import FormControls from './elements/FormControls';
@@ -94,7 +95,9 @@ class PreferredLanguage extends React.Component {
                   >
                     <option value="">&nbsp;</option>
                     {sortedLanguages.map(({ code, name }) => (
-                      <option key={code} value={code}>{name}</option>
+                      <option key={code} value={code}>
+                        {getTranslatedLanguageName(code, name)}
+                      </option>
                     ))}
                   </select>
                   {error !== null && (
@@ -122,7 +125,9 @@ class PreferredLanguage extends React.Component {
                 showVisibility={visibilityLanguageProficiencies !== null}
                 visibility={visibilityLanguageProficiencies}
               />
-              <p data-hj-suppress className="h5">{languageMessages[value]}</p>
+              <p data-hj-suppress className="h5">
+                {getTranslatedLanguageName(value, languageMessages[value])}
+              </p>
             </>
           ),
           empty: (
@@ -140,7 +145,9 @@ class PreferredLanguage extends React.Component {
               <EditableItemHeader
                 content={intl.formatMessage(messages['profile.preferredlanguage.label'])}
               />
-              <p data-hj-suppress className="h5">{languageMessages[value]}</p>
+              <p data-hj-suppress className="h5">
+                {getTranslatedLanguageName(value, languageMessages[value])}
+              </p>
             </>
           ),
         }}
