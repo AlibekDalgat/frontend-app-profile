@@ -18,7 +18,7 @@ import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import CustomHeader from './components/CustomHeader';
-import { FooterSlot } from '@edx/frontend-component-footer';
+import CustomFooter from './components/CustomFooter';
 
 import messages from './i18n';
 import configureStore from './data/configureStore';
@@ -38,7 +38,7 @@ subscribe(APP_READY, () => {
         <main id="main">
           <AppRoutes />
         </main>
-        <FooterSlot />
+        <CustomFooter />
       </AppProvider>
     </StrictMode>,
   );

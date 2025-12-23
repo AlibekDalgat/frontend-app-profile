@@ -19,12 +19,16 @@ const CustomHeader = () => {
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
+  const discoveryUrl = appConfig.DISCOVERY_API_BASE_URL ||
+                      appConfig.DISCOVERY_BASE_URL ||
+                      appConfig.COURSE_CATALOG_URL ||
+                      `${appConfig.LMS_BASE_URL}/courses`;
+
   return (
     <header className="learning-header" style={{
       backgroundColor: '#f8f9fa',
       borderBottom: '1px solid #dee2e6',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-      position: 'relative'
+      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
     }}>
       <a className="sr-only sr-only-focusable" href="#main-content">
         Skip to main content.
@@ -33,62 +37,78 @@ const CustomHeader = () => {
 
         <a
           href={appConfig.LMS_BASE_URL + '/dashboard'}
-          className="logo d-flex align-items-center me-4"
+          className="logo d-flex align-items-center"
+          style={{ height: '100%', marginRight: '1rem' }}
         >
           <img
             className="d-block"
-            src="/static/images/logo.png"
+            src={appConfig.LMS_BASE_URL + "/static/images/logo.png"}
             alt="Лого компании"
             style={{ height: '40px' }}
           />
         </a>
 
-        <div style={{ position: 'relative', height: '100%', display: 'flex', alignItems: 'center' }}>
+        <nav className="d-flex align-items-center" style={{ marginRight: 'auto' }}>
           <a
             href={appConfig.LMS_BASE_URL + '/dashboard'}
-            className="nav-link me-3"
+            className="nav-link"
             style={{
-              whiteSpace: 'nowrap',
-              padding: '0.5rem 1rem',
-              color: '#6c757d',
+              background: 'none',
+              borderBottom: '2px solid transparent',
+              color: '#374151',
+              display: 'block',
+              fontSize: '14px',
               fontWeight: '500',
+              lineHeight: '22px',
+              padding: '20px 0',
+              margin: '0 16px 0 0',
               textDecoration: 'none',
-              borderRadius: '0',
-              background: 'transparent',
-              border: 'none',
               cursor: 'pointer',
-              transition: 'color 0.2s ease',
-              display: 'inline-block',
+              transition: 'all 0.2s ease',
               position: 'relative'
             }}
             onMouseEnter={(e) => {
-              e.target.style.color = '#2c3e50';
+              e.target.style.color = '#111827';
+              e.target.style.borderBottomColor = '#2F2F60';
             }}
             onMouseLeave={(e) => {
-              e.target.style.color = '#6c757d';
+              e.target.style.color = '#374151';
+              e.target.style.borderBottomColor = 'transparent';
             }}
           >
-            Мои курсы
+            Моё обучение
           </a>
-          <div
+
+          <a
+            href={discoveryUrl}
+            className="nav-link"
             style={{
-              position: 'absolute',
-              bottom: '-2px',
-              left: '1rem',
-              right: '1rem',
-              height: '3px',
-              backgroundColor: 'transparent',
-              transition: 'background-color 0.2s ease',
-              zIndex: 10
+              background: 'none',
+              borderBottom: '2px solid transparent',
+              color: '#374151',
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '500',
+              lineHeight: '22px',
+              padding: '20px 0',
+              margin: '0 16px 0 0',
+              textDecoration: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              position: 'relative'
             }}
             onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#15376d';
+              e.target.style.color = '#111827';
+              e.target.style.borderBottomColor = '#2F2F60';
             }}
             onMouseLeave={(e) => {
-              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = '#374151';
+              e.target.style.borderBottomColor = 'transparent';
             }}
-          />
-        </div>
+          >
+            Каталог обучения
+          </a>
+        </nav>
 
         <div className="flex-grow-1"></div>
 
@@ -104,14 +124,23 @@ const CustomHeader = () => {
               type="button"
               className="dropdown-toggle btn btn-outline-primary d-flex align-items-center"
               onClick={toggleDropdown}
+              style={{
+                borderColor: '#2F2F60',
+                color: '#2F2F60',
+                backgroundColor: 'transparent',
+                height: '3rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
             >
               <svg
                 aria-hidden="true"
                 focusable="false"
-                className="svg-inline--fa fa-circle-user fa-lg d-md-none me-2"
+                className="svg-inline--fa fa-circle-user fa-lg d-md-none"
                 role="img"
                 viewBox="0 0 512 512"
-                style={{ height: '20px' }}
+                style={{ height: '1.5rem', width: '1.5rem' }}
               >
                 <path
                   fill="currentColor"
@@ -124,7 +153,7 @@ const CustomHeader = () => {
             </button>
             <div className={`dropdown-menu-right dropdown-menu ${isDropdownOpen ? 'show' : ''}`}>
               <a href={appConfig.LMS_BASE_URL + '/dashboard'} className="pgn__dropdown-item dropdown-item">
-                Панель управления
+                Моё обучение
               </a>
               <a
                 href={`${appConfig.ACCOUNT_PROFILE_URL}/u/${authenticatedUser.username}`}
