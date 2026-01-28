@@ -37,6 +37,7 @@ import LearningGoal from './forms/LearningGoal';
 import City from './forms/City';
 import Position from './forms/Position';
 import CompanyName from './forms/CompanyName';
+import Rewards from './forms/Rewards'
 
 // Selectors
 import { profilePageSelector } from './data/selectors';
@@ -188,6 +189,8 @@ class ProfilePage extends React.Component {
       visibilityLanguageProficiencies,
       courseCertificates,
       visibilityCourseCertificates,
+      rewards,
+      visibilityRewards,
       bio,
       visibilityBio,
       requiresParentalConsent,
@@ -220,6 +223,9 @@ class ProfilePage extends React.Component {
     const isSocialLinksBLockVisible = isBlockVisible(socialLinks.some((link) => link.socialLink !== null));
     const isBioBlockVisible = isBlockVisible(bio);
     const isCertificatesBlockVisible = isBlockVisible(courseCertificates.length);
+    const isRewardsBlockVisible = this.isAuthenticatedUserProfile()
+      ? true
+      : !!(rewards && rewards.length > 0);
     const isNameBlockVisible = isBlockVisible(name);
     const isLocationBlockVisible = isBlockVisible(country);
     const isCityBlockVisible = isBlockVisible(city);
@@ -351,6 +357,14 @@ class ProfilePage extends React.Component {
                 {...commonFormProps}
               />
             )}
+            {isRewardsBlockVisible && (
+              <Rewards
+                rewards={rewards}
+                visibilityRewards={visibilityRewards}
+                formId="rewards"
+                {...commonFormProps}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -385,6 +399,13 @@ ProfilePage.propTypes = {
     title: PropTypes.string,
   })),
   visibilityCourseCertificates: PropTypes.string.isRequired,
+
+  rewards: PropTypes.arrayOf(PropTypes.shape({
+    organization: PropTypes.string,
+    currency: PropTypes.string,
+    experience: PropTypes.number,
+  })),
+  visibilityRewards: PropTypes.string.isRequired,
 
   // Country form data
   country: PropTypes.string,
@@ -481,6 +502,7 @@ ProfilePage.defaultProps = {
   learningGoal: null,
   languageProficiencies: [],
   courseCertificates: null,
+  rewards: null,
   requiresParentalConsent: null,
   dateJoined: null,
 };

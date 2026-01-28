@@ -98,6 +98,7 @@ export async function patchPreferences(username, params) {
   processedParams = convertKeyNames(processedParams, {
     visibility_bio: 'visibility.bio',
     visibility_course_certificates: 'visibility.course_certificates',
+    visibility_rewards: 'visibility.rewards',
     visibility_country: 'visibility.country',
     visibility_date_joined: 'visibility.date_joined',
     visibility_level_of_education: 'visibility.level_of_education',
@@ -145,6 +146,17 @@ export async function getCourseCertificates(username) {
   try {
     const { data } = await getHttpClient().get(url);
     return transformCertificateData(data);
+  } catch (e) {
+    logError(e);
+    return [];
+  }
+}
+
+export async function getRewards(username) {
+  const url = `${getConfig().LMS_BASE_URL}/api/rewards/v0/rewards/${username}/`;
+  try {
+    const { data } = await getHttpClient().get(url);
+    return data;
   } catch (e) {
     logError(e);
     return [];

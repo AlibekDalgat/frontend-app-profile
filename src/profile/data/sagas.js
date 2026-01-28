@@ -41,6 +41,7 @@ export function* handleFetchProfile(action) {
   let preferences = {};
   let account = userAccount;
   let courseCertificates = null;
+  let rewards = null;
 
   try {
     yield put(fetchProfileBegin());
@@ -49,6 +50,7 @@ export function* handleFetchProfile(action) {
     const calls = [
       call(ProfileApiService.getAccount, username),
       call(ProfileApiService.getCourseCertificates, username),
+      call(ProfileApiService.getRewards, username),
     ];
 
     if (isAuthenticatedUserProfile) {
@@ -61,9 +63,9 @@ export function* handleFetchProfile(action) {
     const result = yield all(calls);
 
     if (isAuthenticatedUserProfile) {
-      [account, courseCertificates, preferences] = result;
+      [account, courseCertificates, rewards, preferences] = result;
     } else {
-      [account, courseCertificates] = result;
+      [account, courseCertificates, rewards] = result;
     }
 
     // Set initial visibility values for account
@@ -75,6 +77,7 @@ export function* handleFetchProfile(action) {
         'visibility.name': 'all_users',
         'visibility.bio': 'all_users',
         'visibility.course_certificates': 'all_users',
+        'visibility.rewards': 'all_users',
         'visibility.country': 'all_users',
         'visibility.date_joined': 'all_users',
         'visibility.level_of_education': 'all_users',
@@ -91,6 +94,7 @@ export function* handleFetchProfile(action) {
       account,
       preferences,
       courseCertificates,
+      rewards,
       isAuthenticatedUserProfile,
     ));
 
@@ -115,6 +119,7 @@ export function* handleSaveProfile(action) {
     const accountDrafts = pick(drafts, [
       'bio',
       'courseCertificates',
+      'rewards',
       'country',
       'levelOfEducation',
       'languageProficiencies',
@@ -127,6 +132,7 @@ export function* handleSaveProfile(action) {
     const preferencesDrafts = pick(drafts, [
       'visibilityBio',
       'visibilityCourseCertificates',
+      'visibilityRewards',
       'visibilityCountry',
       'visibilityLevelOfEducation',
       'visibilityLanguageProficiencies',

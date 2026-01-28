@@ -19,6 +19,7 @@ export const initialState = {
   },
   preferences: {},
   courseCertificates: [],
+  rewards: [],
   drafts: {},
   isLoadingProfile: true,
   isAuthenticatedUserProfile: false,
@@ -40,6 +41,7 @@ const profilePage = (state = initialState, action = {}) => {
         account: action.account,
         preferences: action.preferences,
         courseCertificates: action.courseCertificates,
+        rewards: action.rewards,
         isLoadingProfile: false,
         isAuthenticatedUserProfile: action.isAuthenticatedUserProfile,
       };

@@ -15,6 +15,7 @@ export const profileDraftsSelector = state => state.profilePage.drafts;
 export const accountPrivacySelector = state => state.profilePage.preferences.accountPrivacy;
 export const profilePreferencesSelector = state => state.profilePage.preferences;
 export const profileCourseCertificatesSelector = state => state.profilePage.courseCertificates;
+export const profileRewardsSelector = state => state.profilePage.rewards;
 export const profileAccountDraftsSelector = state => state.profilePage.accountDrafts;
 export const profileVisibilityDraftsSelector = state => state.profilePage.visibilityDrafts;
 export const saveStateSelector = state => state.profilePage.saveState;
@@ -28,13 +29,18 @@ export const editableFormModeSelector = createSelector(
   profileAccountSelector,
   isAuthenticatedUserProfileSelector,
   profileCourseCertificatesSelector,
+  profileRewardsSelector,
   formIdSelector,
   currentlyEditingFieldSelector,
-  (account, isAuthenticatedUserProfile, certificates, formId, currentlyEditingField) => {
+  (account, isAuthenticatedUserProfile, certificates, rewards, formId, currentlyEditingField) => {
     // If the prop doesn't exist, that means it hasn't been set (for the current user's profile)
     // or is being hidden from us (for other users' profiles)
     let propExists = account[formId] != null && account[formId].length > 0;
-    propExists = formId === 'certificates' ? certificates.length > 0 : propExists; // overwrite for certificates
+    if (formId === 'certificates') {
+      propExists = certificates.length > 0;
+    } else if (formId === 'rewards') {
+      propExists = (rewards ?? []).length > 0;
+    }
     // If this isn't the current user's profile
     if (!isAuthenticatedUserProfile) {
       return 'static';
@@ -147,6 +153,16 @@ export const certificatesSelector = createSelector(
   }),
 );
 
+export const rewardsSelector = createSelector(
+  editableFormSelector,
+  profileRewardsSelector,
+  (editableForm, rewards) => ({
+    ...editableForm,
+    rewards,
+    value: rewards,
+  }),
+);
+
 export const profileImageSelector = createSelector(
   profileAccountSelector,
   account => (account.profileImage != null
@@ -233,6 +249,7 @@ export const visibilitiesSelector = createSelector(
         return {
           visibilityBio: preferences.visibilityBio || 'all_users',
           visibilityCourseCertificates: preferences.visibilityCourseCertificates || 'all_users',
+          visibilityRewards: preferences.visibilityRewards || 'all_users',
           visibilityCountry: preferences.visibilityCountry || 'all_users',
           visibilityLevelOfEducation: preferences.visibilityLevelOfEducation || 'all_users',
           visibilityLanguageProficiencies: preferences.visibilityLanguageProficiencies || 'all_users',
@@ -246,6 +263,7 @@ export const visibilitiesSelector = createSelector(
         return {
           visibilityBio: 'private',
           visibilityCourseCertificates: 'private',
+          visibilityRewards: 'private',
           visibilityCountry: 'private',
           visibilityLevelOfEducation: 'private',
           visibilityLanguageProficiencies: 'private',
@@ -264,6 +282,7 @@ export const visibilitiesSelector = createSelector(
         return {
           visibilityBio: 'all_users',
           visibilityCourseCertificates: 'all_users',
+          visibilityRewards: 'all_users',
           visibilityCountry: 'all_users',
           visibilityLevelOfEducation: 'all_users',
           visibilityLanguageProficiencies: 'all_users',
@@ -289,14 +308,20 @@ export const formValuesSelector = createSelector(
   visibilitiesSelector,
   profileDraftsSelector,
   profileCourseCertificatesSelector,
+  profileRewardsSelector,
   formSocialLinksSelector,
-  (account, visibilities, drafts, courseCertificates, socialLinks) => ({
+  (account, visibilities, drafts, courseCertificates, rewards, socialLinks) => ({
     bio: chooseFormValue(drafts.bio, account.bio),
     visibilityBio: chooseFormValue(drafts.visibilityBio, visibilities.visibilityBio),
     courseCertificates,
     visibilityCourseCertificates: chooseFormValue(
       drafts.visibilityCourseCertificates,
       visibilities.visibilityCourseCertificates,
+    ),
+    rewards,
+    visibilityRewards: chooseFormValue(
+      drafts.visibilityRewards,
+      visibilities.visibilityRewards
     ),
     country: chooseFormValue(drafts.country, account.country),
     visibilityCountry: chooseFormValue(drafts.visibilityCountry, visibilities.visibilityCountry),
@@ -362,6 +387,10 @@ export const profilePageSelector = createSelector(
     // Certificates form data
     courseCertificates: formValues.courseCertificates,
     visibilityCourseCertificates: formValues.visibilityCourseCertificates,
+
+    // Rewards
+    rewards: formValues.rewards,
+    visibilityRewards: formValues.visibilityRewards,
 
     // Country form data
     country: formValues.country,
