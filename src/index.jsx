@@ -17,7 +17,7 @@ import React, { StrictMode } from 'react';
 // eslint-disable-next-line import/no-unresolved
 import { createRoot } from 'react-dom/client';
 
-import CustomHeader from './components/CustomHeader';
+import { ProfileHeader } from './components/ProfileHeader';
 import CustomFooter from './components/CustomFooter';
 
 import messages from './i18n';
@@ -34,7 +34,7 @@ subscribe(APP_READY, () => {
     <StrictMode>
       <AppProvider store={configureStore()}>
         <Head />
-        <CustomHeader />
+        <ProfileHeader />
         <main id="main">
           <AppRoutes />
         </main>
