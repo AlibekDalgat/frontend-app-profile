@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Spinner, Alert, Badge } from '@openedx/paragon';
+import { Container, Spinner, Alert, Badge, Form, OverlayTrigger, Tooltip } from '@openedx/paragon';
 import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
 import { getConfig } from '@edx/frontend-platform';
+import { InfoOutline } from '@openedx/paragon/icons';
 
 import messages from './RewardsHistory.messages';
 import mobileStyles from './RewardsHistory.mobile.module.css';
@@ -32,6 +33,19 @@ const RewardsHistoryPage = () => {
     fetchHistory();
   }, []);
 
+  const handleParticipateToggle = async (orgId, newValue) => {
+    try {
+      await getAuthenticatedHttpClient().patch(
+        `${getConfig().LMS_BASE_URL}/api/rewards/v0/wallet/${orgId}/participate/`,
+        { participate: newValue }
+      );
+      await fetchHistory();
+    } catch (err) {
+      console.error('Ошибка изменения участия:', err);
+      alert('Не удалось сохранить настройку');
+    }
+  };
+
   if (loading) return <Container size="lg" className="py-5 text-center"><Spinner animation="border" variant="primary" /></Container>;
   if (error) return <Container size="lg" className="py-5"><Alert variant="danger">{error}</Alert></Container>;
   if (!data.organizations?.length) {
@@ -43,47 +57,106 @@ const RewardsHistoryPage = () => {
       <h2 className="mb-5">История наград</h2>
 
       {data.organizations.map((org) => (
-        <OrganizationAccordion key={org.id} organization={org} />
+        <OrganizationAccordion
+          key={org.id}
+          organization={org}
+          onParticipateToggle={handleParticipateToggle}
+        />
       ))}
     </Container>
   );
 };
 
-const OrganizationAccordion = ({ organization }) => {
+const OrganizationAccordion = ({ organization, onParticipateToggle }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [toggling, setToggling] = useState(false);
 
-  const { name, currency_full_name, total_earned, total_balance, total_spent, courses } = organization;
+  const {
+    id,
+    name,
+    currency_full_name,
+    total_earned,
+    total_balance,
+    total_spent,
+    courses,
+    participate_in_rating = false,
+    rating_enabled = false,
+  } = organization;
+
+  const handleSwitchChange = async (e) => {
+    const newValue = e.target.checked;
+    setToggling(true);
+    await onParticipateToggle(id, newValue);
+    setToggling(false);
+  };
+
+  const headerClickHandler = (e) => {
+    if (e.target.closest('label') || e.target.type === 'checkbox') {
+      e.stopPropagation();
+      return;
+    }
+    setIsOpen(!isOpen);
+  };
 
   return (
     <div className="mb-5 border rounded shadow-sm overflow-hidden">
       <div
-        className="p-4 bg-light d-flex justify-content-between align-items-center cursor-pointer"
-        onClick={() => setIsOpen(!isOpen)}
+        className="p-4 bg-light d-flex justify-content-between align-items-start cursor-pointer"
+        onClick={headerClickHandler}
         role="button"
         tabIndex={0}
-        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsOpen(!isOpen)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            headerClickHandler(e);
+          }
+        }}
       >
-        <div>
+        <div className="d-flex flex-column">
           <h3 className="mb-1 fw-bold">{currency_full_name || 'Валюта'}</h3>
-          <div className="text-muted">{name || 'Организация'}</div>
+          <div className="text-muted mb-2">{name || 'Организация'}</div>
+
+          {rating_enabled && (
+            <div className="d-flex align-items-center">
+              <Form.Switch
+                id={`participate-${id}`}
+                checked={participate_in_rating}
+                onChange={handleSwitchChange}
+                disabled={toggling}
+                label=""
+                className="me-2 mb-0"
+              />
+              <div className="small">
+                <span>Участвовать в рейтинге</span>
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    <Tooltip id={`tooltip-${id}`}>
+                      Если включено — ваш опыт будет учитываться в публичном рейтинге организации
+                    </Tooltip>
+                  }
+                >
+                  <InfoOutline className="ms-1 text-muted" />
+                </OverlayTrigger>
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="d-flex align-items-center fs-5">
-          <div className="me-3">
+        <div className="d-flex align-items-center fs-5 gap-4 ms-auto">
+          <div className="me-3 text-center">
             <span className="d-block small text-muted">Начислено</span>
             <strong>{total_earned ?? 0}</strong>
           </div>
-          <div className="mx-3">
+          <div className="mx-3 text-center">
             <span className="d-block small text-muted">Доступно</span>
-            <strong className={total_balance > 0 ? 'text-success' : ''}>
-              {total_balance ?? 0}
-            </strong>
+            <strong className={total_balance > 0 ? 'text-success' : ''}>{total_balance ?? 0}</strong>
           </div>
-          <div className="mx-3">
+          <div className="mx-3 text-center">
             <span className="d-block small text-muted">Списано</span>
             <strong>{total_spent ?? 0}</strong>
           </div>
-          <div className="ms-3 fs-4 fw-bold">{isOpen ? '▲' : '▼'}</div>
+
+          <div className="ms-4 fs-4 fw-bold">{isOpen ? '▲' : '▼'}</div>
         </div>
       </div>
 
