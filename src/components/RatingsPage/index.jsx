@@ -122,7 +122,7 @@ const RatingAccordion = ({ org }) => {
                       <td>
                         {org.user_position.username}
                         {org.user_position.tied_total > 1 && (
-                          <small className="text-muted ms-2">
+                          <small className="text-muted mx-1">
                             и ещё {org.user_position.tied_total - 1}
                           </small>
                         )}

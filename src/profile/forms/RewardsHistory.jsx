@@ -16,20 +16,21 @@ const RewardsHistoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const fetchHistory = async () => {
+    try {
+      const response = await getAuthenticatedHttpClient().get(
+        `${getConfig().LMS_BASE_URL}/api/rewards/v0/history/`
+      );
+      setData(response.data || { organizations: [] });
+    } catch (err) {
+      console.error(err);
+      setError('Не удалось загрузить историю наград');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const response = await getAuthenticatedHttpClient().get(
-          `${getConfig().LMS_BASE_URL}/api/rewards/v0/history/`
-        );
-        setData(response.data || { organizations: [] });
-      } catch (err) {
-        console.error(err);
-        setError('Не удалось загрузить историю наград');
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchHistory();
   }, []);
 
@@ -101,7 +102,7 @@ const OrganizationAccordion = ({ organization, onParticipateToggle }) => {
   return (
     <div className="mb-5 border rounded shadow-sm overflow-hidden">
       <div
-        className="p-4 bg-light d-flex justify-content-between align-items-start cursor-pointer"
+        className={`p-4 bg-light d-flex justify-content-between align-items-start cursor-pointer ${mobileStyles.orgHeader}`}
         onClick={headerClickHandler}
         role="button"
         tabIndex={0}
@@ -142,7 +143,7 @@ const OrganizationAccordion = ({ organization, onParticipateToggle }) => {
           )}
         </div>
 
-        <div className="d-flex align-items-center fs-5 gap-4 ms-auto">
+        <div className={`d-flex align-items-center fs-5 gap-4 ms-auto ${mobileStyles.sums}`}>
           <div className="me-3 text-center">
             <span className="d-block small text-muted">Начислено</span>
             <strong>{total_earned ?? 0}</strong>
@@ -190,25 +191,24 @@ const CourseAccordion = ({ course }) => {
   return (
     <>
       <div
-        className="d-flex justify-content-between align-items-center px-4 py-3 bg-white cursor-pointer border-top"
-        onClick={() => setIsOpen(!isOpen)}
+        className={`d-flex justify-content-between align-items-center px-4 py-3 bg-white cursor-pointer border-top ${mobileStyles.courseHeader}`}        onClick={() => setIsOpen(!isOpen)}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsOpen(!isOpen)}
       >
-        <div className="d-flex align-items-center">
+        <div className={`d-flex align-items-center ${mobileStyles.courseTitle}`}>
           <div className="fw-bold fs-5">{display_name}</div>
           {number && (
             <>
               <span className="mx-1">&nbsp;</span>
-              <Badge bg="secondary">
+              <Badge bg="secondary" className={mobileStyles.courseBadge}>
                 {number}
               </Badge>
             </>
           )}
         </div>
 
-        <div className="d-flex align-items-center text-nowrap">
+        <div className={`d-flex align-items-center text-nowrap ${mobileStyles.courseSums}`}>
           <div className="me-3">
             <span className="d-block small text-muted">Начислено</span>
             <strong>{total_earned}</strong>
@@ -228,12 +228,12 @@ const CourseAccordion = ({ course }) => {
       </div>
 
       {isOpen && (
-        <div className="px-5 py-4 border-top">
+        <div className={`px-5 py-4 border-top ${mobileStyles.blocksContent}`}>
           {blocks.length === 0 ? (
             <div className="text-muted py-2">Нет наград по блокам</div>
           ) : (
             <div className="table-responsive">
-              <table className="table table-sm table-hover mb-0">
+              <table className={`table table-sm table-hover mb-0 ${mobileStyles.blocksTable}`}>
                 <thead className="table-light">
                   <tr>
                     <th>Название блока</th>
