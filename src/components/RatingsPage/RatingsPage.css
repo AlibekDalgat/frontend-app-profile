@@ -1,0 +1,23 @@
+.rating-table .table-primary {
+  background-color: #cfe2ff !important;
+  border: none !important;
+}
+.rating-table .table-primary td {
+  border: none !important;
+}
+.rating-table .table-primary + tr td {
+  border-top: 1px solid #dee2e6 !important;
+}
+.rating-table tr.table-primary td:first-child,
+.rating-table tr.table-primary td:last-child {
+  border-left: none !important;
+  border-right: none !important;
+}
+.rating-table tbody tr:hover {
+  background-color: transparent !important;
+}
+.rating-table .table-light:hover,
+.rating-table .table-primary:hover,
+.rating-table .table-hover tbody tr:hover {
+  background-color: transparent !important;
+}

@@ -6,6 +6,7 @@ import {
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { ProfilePage, NotFoundPage } from '../profile';
 import RewardsHistoryPage from '../profile/forms/RewardsHistory';
+import RatingsPage from '../components/RatingsPage';
 
 const AppRoutes = () => {
   const navigate = useNavigate();
@@ -19,6 +20,16 @@ const AppRoutes = () => {
           <AuthenticatedPageRoute>
             <PageWrap>
               <RewardsHistoryPage />
+            </PageWrap>
+          </AuthenticatedPageRoute>
+        }
+      />
+      <Route
+        path="/ratings"
+        element={
+          <AuthenticatedPageRoute>
+            <PageWrap>
+              <RatingsPage />
             </PageWrap>
           </AuthenticatedPageRoute>
         }
