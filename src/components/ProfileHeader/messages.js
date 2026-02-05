@@ -11,6 +11,11 @@ const messages = defineMessages({
     defaultMessage: 'Каталог обучения',
     description: 'Ссылка на каталог курсов в основном меню хедера',
   },
+  ratings: {
+    id: 'profile.header.ratings',
+    defaultMessage: 'Рейтинги',
+    description: 'Ссылка на страницу рейтингов в основном меню хедера',
+  },
 
   profile: {
     id: 'profile.header.profileLink',

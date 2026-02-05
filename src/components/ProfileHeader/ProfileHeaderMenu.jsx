@@ -14,6 +14,11 @@ const getProfileHeaderMenu = (formatMessage, catalogUrl, authenticatedUser) => (
       href: catalogUrl.startsWith('http') ? catalogUrl : `${getConfig().LMS_BASE_URL}${catalogUrl}`,
       content: formatMessage(messages.catalog),
     },
+    {
+      type: 'item',
+      href: `${getConfig().ACCOUNT_PROFILE_URL}/ratings`,
+      content: formatMessage(messages.ratings),
+    },
   ],
 
   secondaryMenu: [],
