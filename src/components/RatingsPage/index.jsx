@@ -3,7 +3,8 @@ import { Container, Spinner, Alert } from '@openedx/paragon';
 import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
 import { getConfig } from '@edx/frontend-platform';
 
-import ratingStyles from './RatingsPage.css'
+import ratingStyles from './RatingsPage.css';
+import messages from './messages';
 
 const RatingsPage = () => {
   const [ratings, setRatings] = useState([]);
@@ -19,7 +20,7 @@ const RatingsPage = () => {
         setRatings(res.data.ratings || []);
       } catch (err) {
         console.error(err);
-        setError('Не удалось загрузить рейтинги');
+        setError(messages.errorLoading.defaultMessage);
       } finally {
         setLoading(false);
       }
@@ -27,20 +28,33 @@ const RatingsPage = () => {
     fetchRatings();
   }, []);
 
-  if (loading) return <Container size="lg" className="py-5 text-center"><Spinner animation="border" variant="primary" /></Container>;
-  if (error) return <Container size="lg" className="py-5"><Alert variant="danger">{error}</Alert></Container>;
+  if (loading) {
+    return (
+      <Container size="lg" className="py-5 text-center">
+        <Spinner animation="border" variant="primary" />
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container size="lg" className="py-5">
+        <Alert variant="danger">{error}</Alert>
+      </Container>
+    );
+  }
 
   if (ratings.length === 0) {
     return (
       <Container size="lg" className="py-5">
-        <Alert variant="info">Нет рейтингов для ваших организаций.</Alert>
+        <Alert variant="info">{messages.noRatings.defaultMessage}</Alert>
       </Container>
     );
   }
 
   return (
     <Container size="lg" className="py-5">
-      <h2 className="mb-5">Рейтинги</h2>
+      <h2 className="mb-5">{messages.pageTitle.defaultMessage}</h2>
 
       {ratings.map((org) => (
         <RatingAccordion key={org.organization_id} org={org} />
@@ -52,7 +66,7 @@ const RatingsPage = () => {
 const RatingAccordion = ({ org }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const userRank = org.user_position || 0; // число: 0 или ранг в топе
+  const userRank = org.user_position || 0;
   const userInTop = userRank > 0 && userRank <= org.top_limit;
 
   return (
@@ -67,7 +81,9 @@ const RatingAccordion = ({ org }) => {
         <div>
           <h3 className="mb-1 fw-bold">{org.currency || 'Валюта'}</h3>
           <div className="text-muted">{org.organization_name || 'Организация'}</div>
-          <div className="small text-muted">Топ-{org.top_limit} участников</div>
+          <div className="small text-muted">
+            {messages.topParticipants.defaultMessage.replace('{topLimit}', org.top_limit)}
+          </div>
         </div>
         <div className="fs-4 fw-bold">{isOpen ? '▲' : '▼'}</div>
       </div>
@@ -88,9 +104,7 @@ const RatingAccordion = ({ org }) => {
                   org.top.map((entry) => (
                     <tr
                       key={entry.rank}
-                      className={
-                        userRank === entry.rank ? 'table-primary' : ''
-                      }
+                      className={userRank === entry.rank ? 'table-primary' : ''}
                     >
                       <td className="text-center fw-bold">{entry.rank}</td>
                       <td>
@@ -107,7 +121,7 @@ const RatingAccordion = ({ org }) => {
                 ) : (
                   <tr>
                     <td colSpan="3" className="text-center text-muted py-4">
-                      Топ пока пуст
+                      {messages.topEmpty.defaultMessage}
                     </td>
                   </tr>
                 )}
@@ -121,18 +135,18 @@ const RatingAccordion = ({ org }) => {
             ) : (
               <div className="p-4 bg-light border-top text-center">
                 <div className="mb-2 text-muted fw-medium">
-                  Вы участвуете в рейтинге, но пока не вошли в топ-{org.top_limit}
+                  {messages.participatesButNotInTop.defaultMessage.replace('{topLimit}', org.top_limit)}
                 </div>
                 <div className="small text-muted">
-                  Чтобы попасть в рейтинг, нужно набрать больше опыта. Продолжайте проходить курсы!
+                  {messages.needMoreExperience.defaultMessage}
                 </div>
               </div>
             )
           ) : (
             <div className="p-4 bg-light border-top text-center text-muted">
-              Вы не участвуете в этом рейтинге.
+              {messages.notParticipates.defaultMessage}
               <br />
-              <small>Включить участие можно на странице истории наград</small>
+              <small>{messages.enableInHistory.defaultMessage}</small>
             </div>
           )}
         </div>
