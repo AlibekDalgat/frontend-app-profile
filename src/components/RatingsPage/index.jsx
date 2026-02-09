@@ -52,8 +52,8 @@ const RatingsPage = () => {
 const RatingAccordion = ({ org }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const userInTop = org.user_position && org.user_position.rank <= org.top_limit;
-  const showEllipsisAndUser = org.user_position && !userInTop;
+  const userRank = org.user_position || 0; // число: 0 или ранг в топе
+  const userInTop = userRank > 0 && userRank <= org.top_limit;
 
   return (
     <div className="mb-5 border rounded shadow-sm overflow-hidden">
@@ -89,7 +89,7 @@ const RatingAccordion = ({ org }) => {
                     <tr
                       key={entry.rank}
                       className={
-                        org.user_position?.rank === entry.rank ? 'table-primary' : ''
+                        userRank === entry.rank ? 'table-primary' : ''
                       }
                     >
                       <td className="text-center fw-bold">{entry.rank}</td>
@@ -111,33 +111,28 @@ const RatingAccordion = ({ org }) => {
                     </td>
                   </tr>
                 )}
-
-                {showEllipsisAndUser && (
-                  <>
-                    <tr>
-                      <td colSpan="3" className="text-center text-muted py-2">…</td>
-                    </tr>
-                    <tr className="table-primary">
-                      <td className="text-center fw-bold">{org.user_position.rank}</td>
-                      <td>
-                        {org.user_position.username}
-                        {org.user_position.tied_total > 1 && (
-                          <small className="text-muted mx-1">
-                            и ещё {org.user_position.tied_total - 1}
-                          </small>
-                        )}
-                      </td>
-                      <td className="text-end">{org.user_position.experience}</td>
-                    </tr>
-                  </>
-                )}
               </tbody>
             </table>
           </div>
 
-          {!org.user_position && (
-            <div className="p-3 text-muted border-top">
-              Вы не участвуете в этом рейтинге или у вас пока нет опыта.
+          {org.user_participates ? (
+            userInTop ? (
+              null
+            ) : (
+              <div className="p-4 bg-light border-top text-center">
+                <div className="mb-2 text-muted fw-medium">
+                  Вы участвуете в рейтинге, но пока не вошли в топ-{org.top_limit}
+                </div>
+                <div className="small text-muted">
+                  Чтобы попасть в рейтинг, нужно набрать больше опыта. Продолжайте проходить курсы!
+                </div>
+              </div>
+            )
+          ) : (
+            <div className="p-4 bg-light border-top text-center text-muted">
+              Вы не участвуете в этом рейтинге.
+              <br />
+              <small>Включить участие можно на странице истории наград</small>
             </div>
           )}
         </div>
