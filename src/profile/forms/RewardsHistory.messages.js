@@ -9,4 +9,5 @@ export default {
   'blockType.scorm': 'SCORM',
   'blockType.poll': 'Опрос',
   'blockType.survey': 'Оценка',
+  'blockType.word_cloud': 'Вебинар',
 };
