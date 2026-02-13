@@ -11,7 +11,7 @@ const getBlockTypeDisplayName = (blockType) => {
   return messages[`blockType.${blockType}`] || blockType;
 };
 
-const RewardsHistoryPage = () => {
+const RewardsTab = () => {
   const [data, setData] = useState({ organizations: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,16 +47,14 @@ const RewardsHistoryPage = () => {
     }
   };
 
-  if (loading) return <Container size="lg" className="py-5 text-center"><Spinner animation="border" variant="primary" /></Container>;
-  if (error) return <Container size="lg" className="py-5"><Alert variant="danger">{error}</Alert></Container>;
+  if (loading) return <Spinner animation="border" variant="primary" />;
+  if (error) return <Alert variant="danger">{error}</Alert>;
   if (!data.organizations?.length) {
-    return <Container size="lg" className="py-5"><Alert variant="info">У вас пока нет записей в истории наград.</Alert></Container>;
+    return <Alert variant="info">У вас пока нет записей в истории наград.</Alert>;
   }
 
   return (
-    <Container size="lg" className="py-5">
-      <h2 className="mb-5">История наград</h2>
-
+    <>
       {data.organizations.map((org) => (
         <OrganizationAccordion
           key={org.id}
@@ -64,7 +62,7 @@ const RewardsHistoryPage = () => {
           onParticipateToggle={handleParticipateToggle}
         />
       ))}
-    </Container>
+    </>
   );
 };
 
@@ -276,4 +274,4 @@ const CourseAccordion = ({ course }) => {
   );
 };
 
-export default RewardsHistoryPage;
+export default RewardsTab;

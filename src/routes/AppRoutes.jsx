@@ -5,7 +5,7 @@ import {
 } from '@edx/frontend-platform/react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { ProfilePage, NotFoundPage } from '../profile';
-import RewardsHistoryPage from '../profile/forms/RewardsHistory';
+import MyRewardsPage from '../components/rewards/MyRewardsPage';
 import RatingsPage from '../components/RatingsPage';
 
 const AppRoutes = () => {
@@ -19,7 +19,7 @@ const AppRoutes = () => {
         element={
           <AuthenticatedPageRoute>
             <PageWrap>
-              <RewardsHistoryPage />
+              <MyRewardsPage />
             </PageWrap>
           </AuthenticatedPageRoute>
         }
