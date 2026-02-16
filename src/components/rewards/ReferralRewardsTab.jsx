@@ -6,10 +6,12 @@ import {
   Modal,
   Spinner,
   Alert,
+  OverlayTrigger,
+  Tooltip
 } from '@openedx/paragon';
 import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
 import { getConfig } from '@edx/frontend-platform';
-import { ContentCopy } from '@openedx/paragon/icons';
+import { ContentCopy, InfoOutline } from '@openedx/paragon/icons';
 import { QRCodeSVG } from 'qrcode.react';
 
 import mobileStyles from './RewardsHistory.mobile.module.css';
@@ -106,8 +108,9 @@ const UserAccordion = ({ userRef }) => {
   );
 };
 
-const OrganizationAccordion = ({ organization, onInviteClick }) => {
+const OrganizationAccordion = ({ organization, onParticipateToggle, onInviteClick }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [toggling, setToggling] = useState(false);
 
   const {
     id,
@@ -117,7 +120,16 @@ const OrganizationAccordion = ({ organization, onInviteClick }) => {
     total_spent = 0,
     referrer_rewards = [],
     referee_rewards = null,
+    referral_enabled = false,
+    user_referral_active = false,
   } = organization;
+
+  const handleSwitchChange = async (e) => {
+    const newValue = e.target.checked;
+    setToggling(true);
+    await onParticipateToggle(id, newValue);
+    setToggling(false);
+  };
 
   let allUsers = [...referrer_rewards];
   if (referee_rewards) {
@@ -126,6 +138,10 @@ const OrganizationAccordion = ({ organization, onInviteClick }) => {
   allUsers.sort((a, b) => (b.isInviter ? 1 : 0) - (a.isInviter ? 1 : 0));
 
   const headerClickHandler = (e) => {
+    if (e.target.closest('label') || e.target.type === 'checkbox') {
+      e.stopPropagation();
+      return;
+    }
     if (e.target.tagName === 'BUTTON') return;
     setIsOpen(!isOpen);
   };
@@ -141,16 +157,45 @@ const OrganizationAccordion = ({ organization, onInviteClick }) => {
       >
         <div className="d-flex flex-column">
           <h3 className="mb-1 fw-bold">{name}</h3>
-          <Button
-            variant="outline-primary"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onInviteClick(organization, e);
-            }}
-          >
-            Пригласить
-          </Button>
+
+          {referral_enabled && (
+            <div className="d-flex align-items-center mb-2">
+              <Form.Switch
+                id={`referral-participate-${id}`}
+                checked={user_referral_active}
+                onChange={handleSwitchChange}
+                disabled={toggling}
+                label=""
+                className="me-2 mb-0"
+              />
+              <div className="small">
+                <span>Участвовать в реферальной программе</span>
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    <Tooltip id={`tooltip-ref-${id}`}>
+                      Если включено — другие пользователи смогут регистрироваться по вашей реферальной ссылке, за что Вы получите награды
+                    </Tooltip>
+                  }
+                >
+                  <InfoOutline className="ms-1 text-muted" />
+                </OverlayTrigger>
+              </div>
+            </div>
+          )}
+
+          {user_referral_active && (
+            <Button
+              variant="outline-primary"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onInviteClick(organization, e);
+              }}
+            >
+              Пригласить
+            </Button>
+          )}
         </div>
 
         <div className={`d-flex align-items-center fs-5 gap-4 ms-auto ${mobileStyles.sums}`}>
@@ -312,6 +357,19 @@ const ReferralRewardsTab = () => {
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [coursesLoading, setCoursesLoading] = useState(false);
 
+  const handleParticipateToggle = async (orgId, newValue) => {
+    try {
+      await getAuthenticatedHttpClient().patch(
+        `${getConfig().LMS_BASE_URL}/api/rewards/v0/referral/wallet/${orgId}/active/`,
+        { is_active: newValue }
+      );
+      await fetchReferralHistory();
+    } catch (err) {
+      console.error('Ошибка изменения участия в реферальной программе:', err);
+      alert('Не удалось сохранить настройку');
+    }
+  };
+
   const fetchReferralHistory = async () => {
     try {
       const response = await getAuthenticatedHttpClient().get(
@@ -427,6 +485,7 @@ const ReferralRewardsTab = () => {
         <OrganizationAccordion
           key={org.id}
           organization={org}
+          onParticipateToggle={handleParticipateToggle}
           onInviteClick={handleInviteClick}
         />
       ))}
