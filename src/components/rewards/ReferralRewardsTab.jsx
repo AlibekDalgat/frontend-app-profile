@@ -15,7 +15,7 @@ import { QRCodeSVG } from 'qrcode.react';
 
 import mobileStyles from './RewardsHistory.mobile.module.css';
 import messages from './RewardsHistory.messages';
-import { fetchReferralHistory, toggleParticipateInReferral, fetchEnrolledCourses, generateReferralLink } from './data/api';
+import { fetchReferralHistory, toggleParticipateInReferral, fetchEnrolledCourses, generateReferralLink, toggleParticipateInReferralRating } from './data/api';
 
 const UserAccordion = ({ userRef, intl }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -109,7 +109,7 @@ const UserAccordion = ({ userRef, intl }) => {
   );
 };
 
-const OrganizationAccordion = ({ organization, onParticipateToggle, onInviteClick, intl }) => {
+const OrganizationAccordion = ({ organization, onParticipateToggle, onParticipateRatingToggle, onInviteClick, intl }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [toggling, setToggling] = useState(false);
 
@@ -123,12 +123,20 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, onInviteClic
     referee_rewards = null,
     referral_enabled = false,
     user_referral_active = false,
+    participate_in_rating = false,
   } = organization;
 
   const handleSwitchChange = async (e) => {
     const newValue = e.target.checked;
     setToggling(true);
     await onParticipateToggle(id, newValue);
+    setToggling(false);
+  };
+
+  const handleSwitchRatingChange = async (e) => {
+    const newValue = e.target.checked;
+    setToggling(true);
+    await onParticipateRatingToggle(id, newValue);
     setToggling(false);
   };
 
@@ -196,6 +204,32 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, onInviteClic
             >
               {intl.formatMessage(messages.inviteButton)}
             </Button>
+          )}
+
+          {referral_enabled && (
+            <div className="d-flex align-items-center mb-2 mt-2">
+              <Form.Switch
+                id={`referral-rating-participate-${id}`}
+                checked={participate_in_rating}
+                onChange={handleSwitchRatingChange}
+                disabled={toggling}
+                label=""
+                className="me-2 mb-0"
+              />
+              <div className="small">
+                <span>{intl.formatMessage({ id: 'profile.referralParticipateInRating', defaultMessage: 'Участвовать в реферальном рейтинге' })}</span>
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    <Tooltip>
+                      {intl.formatMessage({ id: 'profile.referralRatingTooltip', defaultMessage: 'Ваш реферальный опыт будет виден в общем рейтинге' })}
+                    </Tooltip>
+                  }
+                >
+                  <InfoOutline className="ms-1 text-muted" />
+                </OverlayTrigger>
+              </div>
+            </div>
           )}
         </div>
 
@@ -393,6 +427,21 @@ const ReferralRewardsTab = ({ intl }) => {
     }
   };
 
+  const handleParticipateRatingToggle = async (orgId, newValue) => {
+    try {
+      await toggleParticipateInReferralRating(orgId, newValue);
+      setData(prev => ({
+        ...prev,
+        organizations: prev.organizations.map(org =>
+          org.id === orgId ? { ...org, participate_in_rating: newValue } : org
+        )
+      }));
+    } catch (err) {
+      console.error(intl.formatMessage(messages.errorToggleReferralRating), err);
+      alert(intl.formatMessage(messages.errorSaveSetting));
+    }
+  };
+
   const fetchReferralHistoryLocal = async () => {
     try {
       const response = await fetchReferralHistory();
@@ -486,6 +535,7 @@ const ReferralRewardsTab = ({ intl }) => {
           key={org.id}
           organization={org}
           onParticipateToggle={handleParticipateToggle}
+          onParticipateRatingToggle={handleParticipateRatingToggle}
           onInviteClick={handleInviteClick}
           intl={intl}
         />

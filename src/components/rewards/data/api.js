@@ -12,6 +12,13 @@ export const toggleParticipateInRating = async (orgId, participate) => {
   );
 };
 
+export const toggleParticipateInReferralRating = async (orgId, participate) => {
+  return getAuthenticatedHttpClient().patch(
+    `${getConfig().LMS_BASE_URL}/api/rewards/v0/referral/wallet/${orgId}/participate-rating/`,
+    { participate }
+  );
+};
+
 export const fetchReferralHistory = async () => {
   return getAuthenticatedHttpClient().get(`${getConfig().LMS_BASE_URL}/api/rewards/v0/referral_history/`);
 };

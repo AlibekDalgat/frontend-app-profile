@@ -221,6 +221,11 @@ export default defineMessages({
     defaultMessage: 'Ошибка изменения участия в реферальной программе:',
     description: 'Сообщение об ошибке изменения участия в рефералах',
   },
+  errorToggleReferralRating: {
+    id: 'rewards.error.toggleReferralRating',
+    defaultMessage: 'Ошибка изменения участия в реферальном рейтинге:',
+    description: 'Сообщение об ошибке изменения участия в реферальном рейтинге',
+  },
   errorGenerateGeneralLink: {
     id: 'rewards.error.generateGeneralLink',
     defaultMessage: 'Не удалось сгенерировать общую ссылку',
