@@ -268,12 +268,29 @@ const CourseSelect = ({ value, onChange, courses, loading }) => {
 const InviteModalContent = ({
   referralLink,
   referralCode,
-  onCopy,
   selectedCourseId,
   onCourseSelect,
   enrolledCourses,
   coursesLoading,
 }) => {
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  const copyToClipboard = (text) => {
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          setCopySuccess(true);
+          setTimeout(() => setCopySuccess(false), 3000);
+        })
+        .catch((err) => {
+          console.error('Ошибка копирования:', err);
+          alert('Не удалось скопировать. Попробуйте выделить текст вручную.');
+        });
+    } else {
+      alert(`Скопируйте вручную:\n\n${text}`);
+    }
+  };
+
   const renderMainContent = () => {
     if (!referralLink) {
       return (
@@ -316,10 +333,16 @@ const InviteModalContent = ({
             variant="outline-secondary"
             size="sm"
             className="ms-2 align-top"
-            onClick={() => onCopy(referralLink)}
+            onClick={() => copyToClipboard(referralLink)}
           >
             <ContentCopy /> Копировать
           </Button>
+
+          {copySuccess && (
+            <div className="mt-2 text-success small fw-bold">
+              Скопировано в буфер обмена!
+            </div>
+          )}
         </div>
       </div>
     );
@@ -456,19 +479,6 @@ const ReferralRewardsTab = () => {
     }
   }, [isInviteModalOpen, selectedOrg, referralLink, selectedCourseId]);
 
-  const copyToClipboard = (text) => {
-    if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(text)
-        .then(() => alert('Скопировано в буфер обмена!'))
-        .catch((err) => {
-          console.error('Ошибка копирования:', err);
-          alert('Не удалось скопировать. Попробуйте выделить текст вручную.');
-        });
-    } else {
-      alert(`Скопируйте вручную:\n\n${text}`);
-    }
-  };
-
   const closeModal = () => {
     setIsInviteModalOpen(false);
   };
@@ -499,7 +509,6 @@ const ReferralRewardsTab = () => {
           <InviteModalContent
             referralLink={referralLink}
             referralCode={referralCode}
-            onCopy={copyToClipboard}
             selectedCourseId={selectedCourseId}
             onCourseSelect={handleCourseSelect}
             enrolledCourses={enrolledCourses}
