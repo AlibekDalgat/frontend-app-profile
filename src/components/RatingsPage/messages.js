@@ -61,13 +61,12 @@ export default {
   },
   learningTab: {
     id: 'profile.ratings.learningTab',
-    defaultMessage: 'Рейтинги по обучению',
+    defaultMessage: 'По обучению',
     description: 'Название вкладки рейтингов за обычное обучение',
   },
-
   referralTab: {
     id: 'profile.ratings.referralTab',
-    defaultMessage: 'Реферальные рейтинги',
+    defaultMessage: 'По рефералам',
     description: 'Название вкладки реферальных рейтингов',
   },
 };

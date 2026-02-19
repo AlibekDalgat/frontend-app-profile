@@ -8,12 +8,12 @@ export default defineMessages({
   },
   learningTabTitle: {
     id: 'rewards.tab.learning',
-    defaultMessage: 'Награды за обучение',
+    defaultMessage: 'За обучение',
     description: 'Заголовок вкладки наград за обучение',
   },
   referralTabTitle: {
     id: 'rewards.tab.referral',
-    defaultMessage: 'Реферальные награды',
+    defaultMessage: 'За рефералы',
     description: 'Заголовок вкладки реферальных наград',
   },
   errorLoadHistory: {

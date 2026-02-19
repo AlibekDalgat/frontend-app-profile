@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Tabs, Tab, Spinner, Alert } from '@openedx/paragon';
+import { Container, Spinner, Alert, Nav } from '@openedx/paragon';
 import { injectIntl } from 'react-intl';
 
 import RewardsTab from './RewardsTab';
@@ -13,21 +13,29 @@ const MyRewardsPage = ({ intl }) => {
     <Container size="lg" className="py-5">
       <h2 className="mb-5">{intl.formatMessage(messages.pageTitle)}</h2>
 
-      <Tabs
-        id="my-rewards-tabs"
+      <Nav
+        variant="pills"
         activeKey={activeTab}
         onSelect={(k) => setActiveTab(k)}
-        variant="tabs"
-        style={{ marginBottom: 10 }}
+        className="mb-4"
       >
-        <Tab eventKey="learning" title={intl.formatMessage(messages.learningTabTitle)}>
-          <RewardsTab />
-        </Tab>
+        <Nav.Item>
+          <Nav.Link eventKey="learning">
+            {intl.formatMessage(messages.learningTabTitle)}
+          </Nav.Link>
+        </Nav.Item>
 
-        <Tab eventKey="referral" title={intl.formatMessage(messages.referralTabTitle)}>
-          <ReferralRewardsTab />
-        </Tab>
-      </Tabs>
+        <Nav.Item>
+          <Nav.Link eventKey="referral">
+            {intl.formatMessage(messages.referralTabTitle)}
+          </Nav.Link>
+        </Nav.Item>
+      </Nav>
+
+      <div>
+        {activeTab === 'learning' && <RewardsTab />}
+        {activeTab === 'referral' && <ReferralRewardsTab />}
+      </div>
     </Container>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Spinner, Alert, Tabs, Tab } from '@openedx/paragon';
+import { Container, Spinner, Alert, Nav } from '@openedx/paragon';
 import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
 import { getConfig } from '@edx/frontend-platform';
 
@@ -62,37 +62,47 @@ const RatingsPage = () => {
     <Container size="lg" className="py-5">
       <h2 className="mb-5">{messages.pageTitle.defaultMessage}</h2>
 
-      <Tabs
-        id="ratings-tabs"
+      <Nav
+        variant="pills"
         activeKey={activeTab}
         onSelect={(key) => setActiveTab(key)}
-        style={{ marginBottom: 10 }}
-        variant="tabs"
+        className="mb-4"
       >
-        <Tab eventKey="learning" title="Рейтинги по обучению" disabled={!hasLearning}>
+        <Nav.Item>
+          <Nav.Link eventKey="learning">{messages.learningTab.defaultMessage}</Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey="referral">{messages.referralTab.defaultMessage}</Nav.Link>
+        </Nav.Item>
+      </Nav>
+
+      {activeTab === 'learning' && (
+        <div>
           {hasLearning ? (
             learningRatings.map((org) => (
               <RatingAccordion key={org.organization_id} org={org} type="learning" />
             ))
           ) : (
             <Alert variant="info" className="mt-4">
-              Нет рейтингов по обучению
+              {messages.noLearningRatings.defaultMessage}
             </Alert>
           )}
-        </Tab>
+        </div>
+      )}
 
-        <Tab eventKey="referral" title="Реферальные рейтинги" disabled={!hasReferral}>
+      {activeTab === 'referral' && (
+        <div>
           {hasReferral ? (
             referralRatings.map((org) => (
               <RatingAccordion key={org.organization_id} org={org} type="referral" />
             ))
           ) : (
             <Alert variant="info" className="mt-4">
-              Нет реферальных рейтингов
+              {messages.noReferralRatings.defaultMessage}
             </Alert>
           )}
-        </Tab>
-      </Tabs>
+        </div>
+      )}
     </Container>
   );
 };
