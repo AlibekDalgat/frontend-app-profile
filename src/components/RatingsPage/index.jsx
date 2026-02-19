@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Spinner, Alert } from '@openedx/paragon';
+import { Container, Spinner, Alert, Nav } from '@openedx/paragon';
 import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
 import { getConfig } from '@edx/frontend-platform';
 
@@ -7,25 +7,28 @@ import ratingStyles from './RatingsPage.css';
 import messages from './messages';
 
 const RatingsPage = () => {
-  const [ratings, setRatings] = useState([]);
+  const [activeTab, setActiveTab] = useState('learning');
+  const [learningRatings, setLearningRatings] = useState([]);
+  const [referralRatings, setReferralRatings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const fetchRatings = async (url, setter) => {
+    try {
+      const res = await getAuthenticatedHttpClient().get(url);
+      setter(res.data.ratings || []);
+    } catch (err) {
+      console.error(err);
+      setError(messages.errorLoading.defaultMessage);
+    }
+  };
+
   useEffect(() => {
-    const fetchRatings = async () => {
-      try {
-        const res = await getAuthenticatedHttpClient().get(
-          `${getConfig().LMS_BASE_URL}/api/rewards/v0/ratings/`
-        );
-        setRatings(res.data.ratings || []);
-      } catch (err) {
-        console.error(err);
-        setError(messages.errorLoading.defaultMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchRatings();
+    setLoading(true);
+    Promise.all([
+      fetchRatings(`${getConfig().LMS_BASE_URL}/api/rewards/v0/ratings/`, setLearningRatings),
+      fetchRatings(`${getConfig().LMS_BASE_URL}/api/rewards/v0/referral-ratings/`, setReferralRatings),
+    ]).finally(() => setLoading(false));
   }, []);
 
   if (loading) {
@@ -44,7 +47,10 @@ const RatingsPage = () => {
     );
   }
 
-  if (ratings.length === 0) {
+  const hasLearning = learningRatings.length > 0;
+  const hasReferral = referralRatings.length > 0;
+
+  if (!hasLearning && !hasReferral) {
     return (
       <Container size="lg" className="py-5">
         <Alert variant="info">{messages.noRatings.defaultMessage}</Alert>
@@ -56,14 +62,52 @@ const RatingsPage = () => {
     <Container size="lg" className="py-5">
       <h2 className="mb-5">{messages.pageTitle.defaultMessage}</h2>
 
-      {ratings.map((org) => (
-        <RatingAccordion key={org.organization_id} org={org} />
-      ))}
+      <Nav
+        variant="pills"
+        activeKey={activeTab}
+        onSelect={(key) => setActiveTab(key)}
+        className="mb-4"
+      >
+        <Nav.Item>
+          <Nav.Link eventKey="learning">{messages.learningTab.defaultMessage}</Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey="referral">{messages.referralTab.defaultMessage}</Nav.Link>
+        </Nav.Item>
+      </Nav>
+
+      {activeTab === 'learning' && (
+        <div>
+          {hasLearning ? (
+            learningRatings.map((org) => (
+              <RatingAccordion key={org.organization_id} org={org} type="learning" />
+            ))
+          ) : (
+            <Alert variant="info" className="mt-4">
+              {messages.noLearningRatings.defaultMessage}
+            </Alert>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'referral' && (
+        <div>
+          {hasReferral ? (
+            referralRatings.map((org) => (
+              <RatingAccordion key={org.organization_id} org={org} type="referral" />
+            ))
+          ) : (
+            <Alert variant="info" className="mt-4">
+              {messages.noReferralRatings.defaultMessage}
+            </Alert>
+          )}
+        </div>
+      )}
     </Container>
   );
 };
 
-const RatingAccordion = ({ org }) => {
+const RatingAccordion = ({ org, type }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const userRank = org.user_position || 0;
@@ -79,8 +123,8 @@ const RatingAccordion = ({ org }) => {
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsOpen(!isOpen)}
       >
         <div>
-          <h3 className="mb-1 fw-bold">{org.currency || 'Валюта'}</h3>
-          <div className="text-muted">{org.organization_name || 'Организация'}</div>
+          <h3 className="mb-1 fw-bold text-break">{org.currency || 'Валюта'}</h3>
+          <div className="text-muted text-break">{org.organization_name || 'Организация'}</div>
           <div className="small text-muted">
             {messages.topParticipants.defaultMessage.replace('{topLimit}', org.top_limit)}
           </div>
@@ -96,7 +140,7 @@ const RatingAccordion = ({ org }) => {
                 <tr>
                   <th style={{ width: '80px' }} className="text-center">Место</th>
                   <th>Участник</th>
-                  <th className="text-end">Опыт</th>
+                  <th className="text-end">{messages.experienceColumn.defaultMessage}</th>
                 </tr>
               </thead>
               <tbody>
@@ -107,7 +151,7 @@ const RatingAccordion = ({ org }) => {
                       className={userRank === entry.rank ? 'table-primary' : ''}
                     >
                       <td className="text-center fw-bold">{entry.rank}</td>
-                      <td>
+                      <td className="text-break">
                         {entry.username}
                         {entry.tied_total > 1 && (
                           <small className="text-muted mx-1">

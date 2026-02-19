@@ -9,18 +9,19 @@ import {
   OverlayTrigger,
   Tooltip
 } from '@openedx/paragon';
-import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
-import { getConfig } from '@edx/frontend-platform';
+import { injectIntl } from 'react-intl';
 import { ContentCopy, InfoOutline } from '@openedx/paragon/icons';
 import { QRCodeSVG } from 'qrcode.react';
 
-import mobileStyles from './RewardsHistory.mobile.module.css';
+import styles from './Rewards.css';
+import messages from './RewardsHistory.messages';
+import { fetchReferralHistory, toggleParticipateInReferral, fetchEnrolledCourses, generateReferralLink, toggleParticipateInReferralRating } from './data/api';
 
-const UserAccordion = ({ userRef }) => {
+const UserAccordion = ({ userRef, intl }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const {
-    username = 'Аноним',
+    username = intl.formatMessage(messages.fallbackUsername),
     total_earned = 0,
     total_spent = 0,
     total_balance = 0,
@@ -31,30 +32,30 @@ const UserAccordion = ({ userRef }) => {
   return (
     <>
       <div
-        className={`d-flex justify-content-between align-items-center px-4 py-3 bg-white cursor-pointer border-top ${mobileStyles.courseHeader}`}
+        className={`d-flex flex-column flex-md-row justify-content-between align-items-start px-4 py-3 bg-white cursor-pointer border-top`}
         onClick={() => setIsOpen(!isOpen)}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsOpen(!isOpen)}
       >
-        <div className={`d-flex align-items-center ${mobileStyles.courseTitle}`}>
-          <div className="fw-bold fs-5">
+        <div className={`d-flex align-items-center`}>
+          <div className="fw-bold fs-5 text-break">
             {username}
-            {isInviter && <Badge bg="primary" className="mx-1">Пригласил Вас</Badge>}
+            {isInviter && <Badge bg="primary" className="mx-1">{intl.formatMessage(messages.inviterBadge)}</Badge>}
           </div>
         </div>
 
-        <div className={`d-flex align-items-center text-nowrap ${mobileStyles.courseSums}`}>
+        <div className={`d-flex align-items-center text-nowrap mt-3 mt-md-0`}>
           <div className="me-3">
-            <span className="d-block small text-muted">Начислено</span>
+            <span className="d-block small text-muted">{intl.formatMessage(messages.earnedLabel)}</span>
             <strong>{total_earned}</strong>
           </div>
           <div className="mx-3">
-            <span className="d-block small text-muted">Доступно</span>
+            <span className="d-block small text-muted">{intl.formatMessage(messages.availableLabel)}</span>
             <strong className={total_balance > 0 ? 'text-success' : ''}>{total_balance}</strong>
           </div>
           <div className="mx-3">
-            <span className="d-block small text-muted">Списано</span>
+            <span className="d-block small text-muted">{intl.formatMessage(messages.spentLabel)}</span>
             <strong>{total_spent}</strong>
           </div>
           <div className="ms-3 fs-4 fw-bold">{isOpen ? '▲' : '▼'}</div>
@@ -62,18 +63,18 @@ const UserAccordion = ({ userRef }) => {
       </div>
 
       {isOpen && (
-        <div className={`px-5 py-4 border-top ${mobileStyles.blocksContent}`}>
+        <div className={`px-5 py-4 border-top`}>
           {actions.length === 0 ? (
-            <div className="text-muted py-2">Нет действий</div>
+            <div className="text-muted py-2">{intl.formatMessage(messages.noActions)}</div>
           ) : (
             <div className="table-responsive">
-              <table className={`table table-sm table-hover mb-0 ${mobileStyles.blocksTable}`}>
+              <table className={`table table-sm table-hover mb-0`}>
                 <thead className="table-light">
                   <tr>
-                    <th>Действие</th>
-                    <th className="text-end">Баллы</th>
-                    <th>Статус</th>
-                    <th>Дата</th>
+                    <th>{intl.formatMessage(messages.actionHeader)}</th>
+                    <th className="text-end">{intl.formatMessage(messages.pointsHeader)}</th>
+                    <th>{intl.formatMessage(messages.statusHeader)}</th>
+                    <th>{intl.formatMessage(messages.earnedDateHeader)}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -84,10 +85,10 @@ const UserAccordion = ({ userRef }) => {
                       <td>
                         {action.spent ? (
                           <span className="text-danger">
-                            Списано {action.spent_at ? `(${new Date(action.spent_at).toLocaleString('ru-RU')})` : ''}
+                            {intl.formatMessage(messages.statusSpent)} {action.spent_at ? `(${new Date(action.spent_at).toLocaleString('ru-RU')})` : ''}
                           </span>
                         ) : (
-                          <span className="text-success fw-bold">Доступно</span>
+                          <span className="text-success fw-bold">{intl.formatMessage(messages.statusAvailable)}</span>
                         )}
                       </td>
                       <td>
@@ -108,7 +109,7 @@ const UserAccordion = ({ userRef }) => {
   );
 };
 
-const OrganizationAccordion = ({ organization, onParticipateToggle, onInviteClick }) => {
+const OrganizationAccordion = ({ organization, onParticipateToggle, onParticipateRatingToggle, onInviteClick, intl }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [toggling, setToggling] = useState(false);
 
@@ -122,12 +123,20 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, onInviteClic
     referee_rewards = null,
     referral_enabled = false,
     user_referral_active = false,
+    participate_in_rating = false,
   } = organization;
 
   const handleSwitchChange = async (e) => {
     const newValue = e.target.checked;
     setToggling(true);
     await onParticipateToggle(id, newValue);
+    setToggling(false);
+  };
+
+  const handleSwitchRatingChange = async (e) => {
+    const newValue = e.target.checked;
+    setToggling(true);
+    await onParticipateRatingToggle(id, newValue);
     setToggling(false);
   };
 
@@ -149,14 +158,14 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, onInviteClic
   return (
     <div className="mb-5 border rounded shadow-sm overflow-hidden">
       <div
-        className={`p-4 bg-light d-flex justify-content-between align-items-start cursor-pointer ${mobileStyles.orgHeader}`}
+        className={`p-4 bg-light d-flex flex-column flex-md-row justify-content-between align-items-start cursor-pointer`}
         onClick={headerClickHandler}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && headerClickHandler(e)}
       >
         <div className="d-flex flex-column">
-          <h3 className="mb-1 fw-bold">{name}</h3>
+          <h3 className="mb-1 fw-bold text-break">{name}</h3>
 
           {referral_enabled && (
             <div className="d-flex align-items-center mb-2">
@@ -169,12 +178,12 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, onInviteClic
                 className="me-2 mb-0"
               />
               <div className="small">
-                <span>Участвовать в реферальной программе</span>
+                <span>{intl.formatMessage(messages.participateInReferral)}</span>
                 <OverlayTrigger
                   placement="top"
                   overlay={
                     <Tooltip id={`tooltip-ref-${id}`}>
-                      Если включено — другие пользователи смогут регистрироваться по вашей реферальной ссылке, за что Вы получите награды
+                      {intl.formatMessage(messages.participateInReferralTooltip)}
                     </Tooltip>
                   }
                 >
@@ -193,22 +202,48 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, onInviteClic
                 onInviteClick(organization, e);
               }}
             >
-              Пригласить
+              {intl.formatMessage(messages.inviteButton)}
             </Button>
+          )}
+
+          {referral_enabled && (
+            <div className="d-flex align-items-center mb-2 mt-2">
+              <Form.Switch
+                id={`referral-rating-participate-${id}`}
+                checked={participate_in_rating}
+                onChange={handleSwitchRatingChange}
+                disabled={toggling}
+                label=""
+                className="me-2 mb-0"
+              />
+              <div className="small">
+                <span>{intl.formatMessage({ id: 'profile.referralParticipateInRating', defaultMessage: 'Участвовать в реферальном рейтинге' })}</span>
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    <Tooltip>
+                      {intl.formatMessage({ id: 'profile.referralRatingTooltip', defaultMessage: 'Ваш реферальный опыт будет виден в общем рейтинге' })}
+                    </Tooltip>
+                  }
+                >
+                  <InfoOutline className="ms-1 text-muted" />
+                </OverlayTrigger>
+              </div>
+            </div>
           )}
         </div>
 
-        <div className={`d-flex align-items-center fs-5 gap-4 ms-auto ${mobileStyles.sums}`}>
+        <div className={`d-flex align-items-center fs-5 gap-4 mt-3 mt-md-0`}>
           <div className="me-3 text-center">
-            <span className="d-block small text-muted">Начислено</span>
+            <span className="d-block small text-muted">{intl.formatMessage(messages.earnedLabel)}</span>
             <strong>{total_earned}</strong>
           </div>
           <div className="mx-3 text-center">
-            <span className="d-block small text-muted">Доступно</span>
+            <span className="d-block small text-muted">{intl.formatMessage(messages.availableLabel)}</span>
             <strong className={total_balance > 0 ? 'text-success' : ''}>{total_balance}</strong>
           </div>
           <div className="mx-3 text-center">
-            <span className="d-block small text-muted">Списано</span>
+            <span className="d-block small text-muted">{intl.formatMessage(messages.spentLabel)}</span>
             <strong>{total_spent}</strong>
           </div>
           <div className="ms-4 fs-4 fw-bold">{isOpen ? '▲' : '▼'}</div>
@@ -219,10 +254,10 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, onInviteClic
         <div className="border-top">
           {allUsers.length > 0 ? (
             allUsers.map((userRef) => (
-              <UserAccordion key={userRef.username} userRef={userRef} />
+              <UserAccordion key={userRef.username} userRef={userRef} intl={intl} />
             ))
           ) : (
-            <div className="p-4 text-muted">Нет реферальных взаимодействий</div>
+            <div className="p-4 text-muted">{intl.formatMessage(messages.noReferralInteractions)}</div>
           )}
         </div>
       )}
@@ -230,12 +265,12 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, onInviteClic
   );
 };
 
-const CourseSelect = ({ value, onChange, courses, loading }) => {
+const CourseSelect = ({ value, onChange, courses, loading, intl }) => {
   if (loading) {
     return (
       <div className="d-flex align-items-center">
         <Spinner animation="border" size="sm" />
-        <span className="ms-2 small">Загрузка курсов...</span>
+        <span className="ms-2 small">{intl.formatMessage(messages.loadingCourses)}</span>
       </div>
     );
   }
@@ -243,7 +278,7 @@ const CourseSelect = ({ value, onChange, courses, loading }) => {
   if (!courses || courses.length === 0) {
     return (
       <Alert variant="info" className="small mb-0">
-        У вас нет активных зачислений на курсы
+        {intl.formatMessage(messages.noEnrolledCourses)}
       </Alert>
     );
   }
@@ -255,7 +290,7 @@ const CourseSelect = ({ value, onChange, courses, loading }) => {
       onChange={onChange}
       aria-label="Выберите курс для реферальной ссылки"
     >
-      <option value="">Общая ссылка (на каталог курсов)</option>
+      <option value="">{intl.formatMessage(messages.generalLinkOption)}</option>
       {courses.map((course) => (
         <option key={course.id} value={course.id}>
           {course.display_name} {course.number ? `(${course.number})` : ''}
@@ -268,18 +303,36 @@ const CourseSelect = ({ value, onChange, courses, loading }) => {
 const InviteModalContent = ({
   referralLink,
   referralCode,
-  onCopy,
   selectedCourseId,
   onCourseSelect,
   enrolledCourses,
   coursesLoading,
+  intl,
 }) => {
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  const copyToClipboard = (text) => {
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          setCopySuccess(true);
+          setTimeout(() => setCopySuccess(false), 3000);
+        })
+        .catch((err) => {
+          console.error('Ошибка копирования:', err);
+          alert('Не удалось скопировать. Попробуйте выделить текст вручную.');
+        });
+    } else {
+      alert(`Скопируйте вручную:\n\n${text}`);
+    }
+  };
+
   const renderMainContent = () => {
     if (!referralLink) {
       return (
         <div className="text-center py-5">
           <Spinner animation="border" />
-          <p className="mt-3">Генерация ссылки...</p>
+          <p className="mt-3">{intl.formatMessage(messages.generatingLink)}</p>
         </div>
       );
     }
@@ -291,7 +344,7 @@ const InviteModalContent = ({
         </div>
 
         <div className="mb-3">
-          <strong>Предоставьте QR-код или ссылку:</strong>{' '}
+          <strong>{intl.formatMessage(messages.provideQrOrLink)}</strong>{' '}
           <div
             className="pgn__form-control-decorator-group font-monospace text-break p-2 rounded border-0"
             style={{ backgroundColor: 'transparent' }}
@@ -316,10 +369,16 @@ const InviteModalContent = ({
             variant="outline-secondary"
             size="sm"
             className="ms-2 align-top"
-            onClick={() => onCopy(referralLink)}
+            onClick={() => copyToClipboard(referralLink)}
           >
-            <ContentCopy /> Копировать
+            <ContentCopy /> {intl.formatMessage(messages.copyButton)}
           </Button>
+
+          {copySuccess && (
+            <div className="mt-2 text-success small fw-bold">
+              {intl.formatMessage(messages.copySuccess)}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -332,19 +391,20 @@ const InviteModalContent = ({
       <hr className="my-4" />
 
       <Form.Group className="mb-3">
-        <Form.Label>Адрес назначения</Form.Label>
+        <Form.Label>{intl.formatMessage(messages.destinationLabel)}</Form.Label>
         <CourseSelect
           value={selectedCourseId}
           onChange={onCourseSelect}
           courses={enrolledCourses}
           loading={coursesLoading}
+          intl={intl}
         />
       </Form.Group>
     </div>
   );
 };
 
-const ReferralRewardsTab = () => {
+const ReferralRewardsTab = ({ intl }) => {
   const [data, setData] = useState({ organizations: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -359,36 +419,44 @@ const ReferralRewardsTab = () => {
 
   const handleParticipateToggle = async (orgId, newValue) => {
     try {
-      await getAuthenticatedHttpClient().patch(
-        `${getConfig().LMS_BASE_URL}/api/rewards/v0/referral/wallet/${orgId}/active/`,
-        { is_active: newValue }
-      );
-      await fetchReferralHistory();
+      await toggleParticipateInReferral(orgId, newValue);
+      await fetchReferralHistoryLocal();
     } catch (err) {
-      console.error('Ошибка изменения участия в реферальной программе:', err);
-      alert('Не удалось сохранить настройку');
+      console.error(intl.formatMessage(messages.errorToggleReferral), err);
+      alert(intl.formatMessage(messages.errorSaveSetting));
     }
   };
 
-  const fetchReferralHistory = async () => {
+  const handleParticipateRatingToggle = async (orgId, newValue) => {
     try {
-      const response = await getAuthenticatedHttpClient().get(
-        `${getConfig().LMS_BASE_URL}/api/rewards/v0/referral_history/`
-      );
+      await toggleParticipateInReferralRating(orgId, newValue);
+      setData(prev => ({
+        ...prev,
+        organizations: prev.organizations.map(org =>
+          org.id === orgId ? { ...org, participate_in_rating: newValue } : org
+        )
+      }));
+    } catch (err) {
+      console.error(intl.formatMessage(messages.errorToggleReferralRating), err);
+      alert(intl.formatMessage(messages.errorSaveSetting));
+    }
+  };
+
+  const fetchReferralHistoryLocal = async () => {
+    try {
+      const response = await fetchReferralHistory();
       setData(response.data || { organizations: [] });
     } catch (err) {
-      setError('Не удалось загрузить реферальную историю');
+      setError(intl.formatMessage(messages.errorLoadReferralHistory));
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchEnrolledCourses = async () => {
+  const fetchEnrolledCoursesLocal = async () => {
     setCoursesLoading(true);
     try {
-      const response = await getAuthenticatedHttpClient().get(
-        `${getConfig().LMS_BASE_URL}/api/rewards/enrolled-courses/`
-      );
+      const response = await fetchEnrolledCourses();
       setEnrolledCourses(response.data.courses || []);
     } catch (err) {
       console.error('Ошибка загрузки курсов:', err);
@@ -398,7 +466,7 @@ const ReferralRewardsTab = () => {
   };
 
   useEffect(() => {
-    fetchReferralHistory();
+    fetchReferralHistoryLocal();
   }, []);
 
   const handleInviteClick = (org, e) => {
@@ -410,32 +478,26 @@ const ReferralRewardsTab = () => {
     setReferralCode('');
     setSelectedCourseId(null);
     setIsInviteModalOpen(true);
-    fetchEnrolledCourses();
+    fetchEnrolledCoursesLocal();
   };
 
   const generateGeneralLink = async () => {
     try {
-      const response = await getAuthenticatedHttpClient().post(
-        `${getConfig().LMS_BASE_URL}/api/rewards/v0/referral/wallet/${selectedOrg.id}/generate-link/`,
-        {}
-      );
+      const response = await generateReferralLink(selectedOrg.id);
       setReferralLink(response.data.referral_link);
       setReferralCode(response.data.referral_code);
     } catch (err) {
-      alert('Не удалось сгенерировать общую ссылку');
+      alert(intl.formatMessage(messages.errorGenerateGeneralLink));
     }
   };
 
   const generateCourseLink = async (courseId) => {
     try {
-      const response = await getAuthenticatedHttpClient().post(
-        `${getConfig().LMS_BASE_URL}/api/rewards/v0/referral/wallet/${selectedOrg.id}/generate-link/`,
-        { course_id: courseId }
-      );
+      const response = await generateReferralLink(selectedOrg.id, courseId);
       setReferralLink(response.data.referral_link);
       setReferralCode(response.data.referral_code);
     } catch (err) {
-      alert('Не удалось сгенерировать ссылку на курс');
+      alert(intl.formatMessage(messages.errorGenerateCourseLink));
     }
   };
 
@@ -456,19 +518,6 @@ const ReferralRewardsTab = () => {
     }
   }, [isInviteModalOpen, selectedOrg, referralLink, selectedCourseId]);
 
-  const copyToClipboard = (text) => {
-    if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(text)
-        .then(() => alert('Скопировано в буфер обмена!'))
-        .catch((err) => {
-          console.error('Ошибка копирования:', err);
-          alert('Не удалось скопировать. Попробуйте выделить текст вручную.');
-        });
-    } else {
-      alert(`Скопируйте вручную:\n\n${text}`);
-    }
-  };
-
   const closeModal = () => {
     setIsInviteModalOpen(false);
   };
@@ -476,7 +525,7 @@ const ReferralRewardsTab = () => {
   if (loading) return <Spinner animation="border" variant="primary" />;
   if (error) return <Alert variant="danger">{error}</Alert>;
   if (!data.organizations?.length) {
-    return <Alert variant="info">У вас пока нет реферальных наград или активных программ.</Alert>;
+    return <Alert variant="info">{intl.formatMessage(messages.noReferralRecords)}</Alert>;
   }
 
   return (
@@ -486,24 +535,26 @@ const ReferralRewardsTab = () => {
           key={org.id}
           organization={org}
           onParticipateToggle={handleParticipateToggle}
+          onParticipateRatingToggle={handleParticipateRatingToggle}
           onInviteClick={handleInviteClick}
+          intl={intl}
         />
       ))}
 
       <Modal
         open={isInviteModalOpen}
         onClose={closeModal}
-        title={`Пригласить в ${selectedOrg?.name || ''}`}
-        closeText="Закрыть"
+        title={`${intl.formatMessage(messages.inviteModalTitlePrefix)} ${selectedOrg?.name || ''}`}
+        closeText={intl.formatMessage(messages.modalCloseText)}
         body={
           <InviteModalContent
             referralLink={referralLink}
             referralCode={referralCode}
-            onCopy={copyToClipboard}
             selectedCourseId={selectedCourseId}
             onCourseSelect={handleCourseSelect}
             enrolledCourses={enrolledCourses}
             coursesLoading={coursesLoading}
+            intl={intl}
           />
         }
         dialogClassName="modal-lg"
@@ -512,4 +563,4 @@ const ReferralRewardsTab = () => {
   );
 };
 
-export default ReferralRewardsTab;
+export default injectIntl(ReferralRewardsTab);

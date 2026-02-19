@@ -21,3 +21,7 @@
 .rating-table .table-hover tbody tr:hover {
   background-color: transparent !important;
 }
+
+.nav-pills .nav-link.active {
+  background-color: #2F2F60;
+}

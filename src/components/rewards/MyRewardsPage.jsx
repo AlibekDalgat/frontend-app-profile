@@ -1,35 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Tabs, Tab, Spinner, Alert } from '@openedx/paragon';
-import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
-import { getConfig } from '@edx/frontend-platform';
+import { Container, Spinner, Alert, Nav } from '@openedx/paragon';
+import { injectIntl } from 'react-intl';
 
 import RewardsTab from './RewardsTab';
 import ReferralRewardsTab from './ReferralRewardsTab';
+import messages from './RewardsHistory.messages';
 
-const MyRewardsPage = () => {
+const MyRewardsPage = ({ intl }) => {
   const [activeTab, setActiveTab] = useState('learning');
 
   return (
     <Container size="lg" className="py-5">
-      <h2 className="mb-5">Мои награды</h2>
+      <h2 className="mb-5">{intl.formatMessage(messages.pageTitle)}</h2>
 
-      <Tabs
-        id="my-rewards-tabs"
+      <Nav
+        variant="pills"
         activeKey={activeTab}
         onSelect={(k) => setActiveTab(k)}
-        variant="tabs"
-        style={{ marginBottom: 10 }}
+        className="mb-4"
       >
-        <Tab eventKey="learning" title="Награды за обучение">
-          <RewardsTab />
-        </Tab>
+        <Nav.Item>
+          <Nav.Link eventKey="learning">
+            {intl.formatMessage(messages.learningTabTitle)}
+          </Nav.Link>
+        </Nav.Item>
 
-        <Tab eventKey="referral" title="Реферальные награды">
-          <ReferralRewardsTab />
-        </Tab>
-      </Tabs>
+        <Nav.Item>
+          <Nav.Link eventKey="referral">
+            {intl.formatMessage(messages.referralTabTitle)}
+          </Nav.Link>
+        </Nav.Item>
+      </Nav>
+
+      <div>
+        {activeTab === 'learning' && <RewardsTab />}
+        {activeTab === 'referral' && <ReferralRewardsTab />}
+      </div>
     </Container>
   );
 };
 
-export default MyRewardsPage;
+export default injectIntl(MyRewardsPage);

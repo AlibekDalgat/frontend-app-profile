@@ -1,0 +1,17 @@
+.pt-4, .py-4 {
+    padding-top: 7px !important;
+}
+
+.pb-4, .py-4 {
+    padding-bottom: 7px !important;
+}
+.px-5, .pl-5 {
+    padding-left: 7px !important;
+}
+.px-5 {
+    padding-right: 7px !important;
+}
+
+.table thead th {
+    vertical-align: top;
+}
