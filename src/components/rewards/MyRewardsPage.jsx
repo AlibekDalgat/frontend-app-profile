@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Tabs, Tab, Spinner, Alert } from '@openedx/paragon';
-import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
-import { getConfig } from '@edx/frontend-platform';
+import { injectIntl } from 'react-intl';
 
 import RewardsTab from './RewardsTab';
 import ReferralRewardsTab from './ReferralRewardsTab';
+import messages from './RewardsHistory.messages';
 
-const MyRewardsPage = () => {
+const MyRewardsPage = ({ intl }) => {
   const [activeTab, setActiveTab] = useState('learning');
 
   return (
     <Container size="lg" className="py-5">
-      <h2 className="mb-5">Мои награды</h2>
+      <h2 className="mb-5">{intl.formatMessage(messages.pageTitle)}</h2>
 
       <Tabs
         id="my-rewards-tabs"
@@ -20,11 +20,11 @@ const MyRewardsPage = () => {
         variant="tabs"
         style={{ marginBottom: 10 }}
       >
-        <Tab eventKey="learning" title="Награды за обучение">
+        <Tab eventKey="learning" title={intl.formatMessage(messages.learningTabTitle)}>
           <RewardsTab />
         </Tab>
 
-        <Tab eventKey="referral" title="Реферальные награды">
+        <Tab eventKey="referral" title={intl.formatMessage(messages.referralTabTitle)}>
           <ReferralRewardsTab />
         </Tab>
       </Tabs>
@@ -32,4 +32,4 @@ const MyRewardsPage = () => {
   );
 };
 
-export default MyRewardsPage;
+export default injectIntl(MyRewardsPage);
