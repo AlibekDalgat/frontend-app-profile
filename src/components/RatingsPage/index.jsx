@@ -123,8 +123,8 @@ const RatingAccordion = ({ org, type }) => {
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsOpen(!isOpen)}
       >
         <div>
-          <h3 className="mb-1 fw-bold">{org.currency || 'Валюта'}</h3>
-          <div className="text-muted">{org.organization_name || 'Организация'}</div>
+          <h3 className="mb-1 fw-bold text-break">{org.currency || 'Валюта'}</h3>
+          <div className="text-muted text-break">{org.organization_name || 'Организация'}</div>
           <div className="small text-muted">
             {messages.topParticipants.defaultMessage.replace('{topLimit}', org.top_limit)}
           </div>
@@ -151,7 +151,7 @@ const RatingAccordion = ({ org, type }) => {
                       className={userRank === entry.rank ? 'table-primary' : ''}
                     >
                       <td className="text-center fw-bold">{entry.rank}</td>
-                      <td>
+                      <td className="text-break">
                         {entry.username}
                         {entry.tied_total > 1 && (
                           <small className="text-muted mx-1">

@@ -3,8 +3,8 @@ import { Container, Spinner, Alert, Badge, Form, OverlayTrigger, Tooltip } from 
 import { injectIntl } from 'react-intl';
 import { InfoOutline } from '@openedx/paragon/icons';
 
+import styles from './Rewards.css';
 import messages from './RewardsHistory.messages';
-import mobileStyles from './RewardsHistory.mobile.module.css';
 import { fetchRewardsHistory, toggleParticipateInRating } from './data/api';
 
 const getBlockTypeDisplayName = (blockType, intl) => {
@@ -97,7 +97,7 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, intl }) => {
   return (
     <div className="mb-5 border rounded shadow-sm overflow-hidden">
       <div
-        className={`p-4 bg-light d-flex justify-content-between align-items-start cursor-pointer ${mobileStyles.orgHeader}`}
+        className={`p-4 bg-light d-flex flex-column flex-md-row justify-content-between align-items-start cursor-pointer`}
         onClick={headerClickHandler}
         role="button"
         tabIndex={0}
@@ -108,8 +108,8 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, intl }) => {
         }}
       >
         <div className="d-flex flex-column">
-          <h3 className="mb-1 fw-bold">{currency_full_name || intl.formatMessage(messages.fallbackCurrency)}</h3>
-          <div className="text-muted mb-2">{name || intl.formatMessage(messages.fallbackOrganization)}</div>
+          <h3 className="mb-1 fw-bold text-break">{currency_full_name || intl.formatMessage(messages.fallbackCurrency)}</h3>
+          <div className="text-muted mb-2 text-break">{name || intl.formatMessage(messages.fallbackOrganization)}</div>
 
           {rating_enabled && (
             <div className="d-flex align-items-center">
@@ -138,7 +138,7 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, intl }) => {
           )}
         </div>
 
-        <div className={`d-flex align-items-center fs-5 gap-4 ms-auto ${mobileStyles.sums}`}>
+        <div className={`d-flex align-items-center fs-5 gap-4 mt-3 mt-md-0`}>
           <div className="me-3 text-center">
             <span className="d-block small text-muted">{intl.formatMessage(messages.earnedLabel)}</span>
             <strong>{total_earned ?? 0}</strong>
@@ -186,25 +186,25 @@ const CourseAccordion = ({ course, intl }) => {
   return (
     <>
       <div
-        className={`d-flex justify-content-between align-items-center px-4 py-3 bg-white cursor-pointer border-top ${mobileStyles.courseHeader}`}
+        className={`d-flex flex-column flex-md-row justify-content-between align-items-start px-4 py-3 bg-white cursor-pointer border-top`}
         onClick={() => setIsOpen(!isOpen)}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsOpen(!isOpen)}
       >
-        <div className={`d-flex align-items-center ${mobileStyles.courseTitle}`}>
-          <div className="fw-bold fs-5">{display_name}</div>
+        <div className={`d-flex align-items-center`}>
+          <div className="fw-bold fs-5 text-break">{display_name}</div>
           {number && (
             <>
               <span className="mx-1">&nbsp;</span>
-              <Badge bg="secondary" className={mobileStyles.courseBadge}>
+              <Badge bg="secondary">
                 {number}
               </Badge>
             </>
           )}
         </div>
 
-        <div className={`d-flex align-items-center text-nowrap ${mobileStyles.courseSums}`}>
+        <div className={`d-flex align-items-center text-nowrap mt-3 mt-md-0`}>
           <div className="me-3">
             <span className="d-block small text-muted">{intl.formatMessage(messages.earnedLabel)}</span>
             <strong>{total_earned}</strong>
@@ -224,12 +224,12 @@ const CourseAccordion = ({ course, intl }) => {
       </div>
 
       {isOpen && (
-        <div className={`px-5 py-4 border-top ${mobileStyles.blocksContent}`}>
+        <div className={`px-5 py-4 border-top`}>
           {blocks.length === 0 ? (
             <div className="text-muted py-2">{intl.formatMessage(messages.noBlockRewards)}</div>
           ) : (
             <div className="table-responsive">
-              <table className={`table table-sm table-hover mb-0 ${mobileStyles.blocksTable}`}>
+              <table className={`table table-sm table-hover mb-0`}>
                 <thead className="table-light">
                   <tr>
                     <th>{intl.formatMessage(messages.blockNameHeader)}</th>
