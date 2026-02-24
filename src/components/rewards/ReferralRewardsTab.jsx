@@ -168,68 +168,68 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, onParticipat
           <h3 className="mb-1 fw-bold text-break">{name}</h3>
 
           {referral_enabled && (
-            <div className="d-flex align-items-center mb-2">
-              <Form.Switch
-                id={`referral-participate-${id}`}
-                checked={user_referral_active}
-                onChange={handleSwitchChange}
-                disabled={toggling}
-                label=""
-                className="me-2 mb-0"
-              />
-              <div className="small">
-                <span>{intl.formatMessage(messages.participateInReferral)}</span>
-                <OverlayTrigger
-                  placement="top"
-                  overlay={
-                    <Tooltip id={`tooltip-ref-${id}`}>
-                      {intl.formatMessage(messages.participateInReferralTooltip)}
-                    </Tooltip>
-                  }
-                >
-                  <InfoOutline className="ms-1 text-muted" />
-                </OverlayTrigger>
+            <>
+              <div className="d-flex align-items-center mb-2">
+                <Form.Switch
+                  id={`referral-participate-${id}`}
+                  checked={user_referral_active}
+                  onChange={handleSwitchChange}
+                  disabled={toggling}
+                  label=""
+                  className="me-2 mb-0"
+                />
+                <div className="small">
+                  <span>{intl.formatMessage(messages.participateInReferral)}</span>
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip id={`tooltip-ref-${id}`}>
+                        {intl.formatMessage(messages.participateInReferralTooltip)}
+                      </Tooltip>
+                    }
+                  >
+                    <InfoOutline className="ms-1 text-muted" />
+                  </OverlayTrigger>
+                </div>
               </div>
-            </div>
-          )}
 
-          {user_referral_active && (
-            <Button
-              variant="outline-primary"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onInviteClick(organization, e);
-              }}
-            >
-              {intl.formatMessage(messages.inviteButton)}
-            </Button>
-          )}
-
-          {referral_enabled && (
-            <div className="d-flex align-items-center mb-2 mt-2">
-              <Form.Switch
-                id={`referral-rating-participate-${id}`}
-                checked={participate_in_rating}
-                onChange={handleSwitchRatingChange}
-                disabled={toggling}
-                label=""
-                className="me-2 mb-0"
-              />
-              <div className="small">
-                <span>{intl.formatMessage({ id: 'profile.referralParticipateInRating', defaultMessage: 'Участвовать в реферальном рейтинге' })}</span>
-                <OverlayTrigger
-                  placement="top"
-                  overlay={
-                    <Tooltip>
-                      {intl.formatMessage({ id: 'profile.referralRatingTooltip', defaultMessage: 'Ваш реферальный опыт будет виден в общем рейтинге' })}
-                    </Tooltip>
-                  }
+              {user_referral_active && (
+                <Button
+                  variant="outline-primary"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onInviteClick(organization, e);
+                  }}
                 >
-                  <InfoOutline className="ms-1 text-muted" />
-                </OverlayTrigger>
+                  {intl.formatMessage(messages.inviteButton)}
+                </Button>
+              )}
+
+              <div className="d-flex align-items-center mb-2 mt-2">
+                <Form.Switch
+                  id={`referral-rating-participate-${id}`}
+                  checked={participate_in_rating}
+                  onChange={handleSwitchRatingChange}
+                  disabled={toggling}
+                  label=""
+                  className="me-2 mb-0"
+                />
+                <div className="small">
+                  <span>{intl.formatMessage({ id: 'profile.referralParticipateInRating', defaultMessage: 'Участвовать в реферальном рейтинге' })}</span>
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip>
+                        {intl.formatMessage({ id: 'profile.referralRatingTooltip', defaultMessage: 'Ваш реферальный опыт будет виден в общем рейтинге' })}
+                      </Tooltip>
+                    }
+                  >
+                    <InfoOutline className="ms-1 text-muted" />
+                  </OverlayTrigger>
+                </div>
               </div>
-            </div>
+            </>
           )}
         </div>
 
