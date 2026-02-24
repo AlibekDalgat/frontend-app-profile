@@ -294,6 +294,26 @@ export default defineMessages({
     id: 'rewards.blockType.unknown',
     defaultMessage: 'Неизвестно',
   },
+  'actionType.registration': {
+    id: 'rewards.actionType.registration',
+    defaultMessage: 'Регистрация',
+  },
+  'actionType.activation': {
+    id: 'rewards.actionType.activation',
+    defaultMessage: 'Подтверждение',
+  },
+  'actionType.first_enroll': {
+    id: 'rewards.actionType.first_enroll',
+    defaultMessage: 'Первая активность',
+  },
+  'actionType.points_threshold': {
+    id: 'rewards.actionType.points_threshold',
+    defaultMessage: 'Прохождение порога',
+  },
+  'actionType.first_completion': {
+    id: 'rewards.actionType.first_completion',
+    defaultMessage: 'Завершение курса',
+  },
   deletedOrUnavailableBlockName: {
     id: 'rewards.deletedOrUnavailableBlockName',
     defaultMessage: 'Блок удалён или недоступен',
