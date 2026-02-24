@@ -17,6 +17,11 @@ import styles from './Rewards.css';
 import messages from './RewardsHistory.messages';
 import { fetchReferralHistory, toggleParticipateInReferral, fetchEnrolledCourses, generateReferralLink, toggleParticipateInReferralRating } from './data/api';
 
+const getActionTypeDisplayName = (actionType, intl) => {
+  const message = messages[`actionType.${actionType}`];
+  return message ? intl.formatMessage(message) : actionType;
+};
+
 const UserAccordion = ({ userRef, intl }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -80,7 +85,7 @@ const UserAccordion = ({ userRef, intl }) => {
                 <tbody>
                   {actions.map((action, idx) => (
                     <tr key={idx}>
-                      <td>{action.action}</td>
+                      <td>{getActionTypeDisplayName(action.action, intl)}</td>
                       <td className="text-end">{action.points}</td>
                       <td>
                         {action.spent ? (
