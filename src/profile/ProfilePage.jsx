@@ -290,23 +290,6 @@ class ProfilePage extends React.Component {
                 {...commonFormProps}
               />
             )}
-            {isPositionBlockVisible && (
-              <Position
-                position={position}
-                visibilityPosition={visibilityPosition}
-                formId="position"
-                cashbackUserId={this.props.cashbackUserId}
-                {...commonFormProps}
-              />
-            )}
-            {isCompanyNameBlockVisible && (
-              <CompanyName
-                companyName={companyName}
-                visibilityCompanyName={visibilityCompanyName}
-                formId="companyName"
-                {...commonFormProps}
-              />
-            )}
             {isLanguageBlockVisible && (
               <PreferredLanguage
                 languageProficiencies={languageProficiencies}
@@ -348,6 +331,23 @@ class ProfilePage extends React.Component {
                 learningGoal={learningGoal}
                 visibilityLearningGoal={visibilityLearningGoal}
                 formId="learningGoal"
+                {...commonFormProps}
+              />
+            )}
+            {isPositionBlockVisible && (
+              <Position
+                position={position}
+                visibilityPosition={visibilityPosition}
+                formId="position"
+                cashbackUserId={this.props.cashbackUserId}
+                {...commonFormProps}
+              />
+            )}
+            {isCompanyNameBlockVisible && (
+              <CompanyName
+                companyName={companyName}
+                visibilityCompanyName={visibilityCompanyName}
+                formId="companyName"
                 {...commonFormProps}
               />
             )}
