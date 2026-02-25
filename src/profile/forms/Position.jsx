@@ -45,11 +45,10 @@ class Position extends React.Component {
 
   render() {
     const {
-      formId, position, visibilityPosition, editMode, saveState, error, intl,
+      formId, position, visibilityPosition, editMode, saveState, error, cashbackUserId, intl,
     } = this.props;
 
-    const isAuthenticatedUser = this.props.isAuthenticatedUserProfile;
-    const canEditContent = false;
+    const canEditContent = cashbackUserId === true;
 
     return (
       <SwitchContent
@@ -89,7 +88,6 @@ class Position extends React.Component {
                   visibility={visibilityPosition}
                   cancelHandler={this.handleClose}
                   changeHandler={this.handleChange}
-                  showVisibilityOnly={!canEditContent}
                 />
               </form>
             </div>
@@ -98,7 +96,7 @@ class Position extends React.Component {
             <>
               <EditableItemHeader
                 content={intl.formatMessage(messages['profile.position.label'])}
-                showEditButton={isAuthenticatedUser}
+                showEditButton
                 onClickEdit={this.handleOpen}
                 showVisibility={visibilityPosition !== null}
                 visibility={visibilityPosition}
@@ -109,7 +107,7 @@ class Position extends React.Component {
           empty: (
             <>
               <EditableItemHeader content={intl.formatMessage(messages['profile.position.label'])} />
-              <EmptyContent onClick={isAuthenticatedUser ? this.handleOpen : null}>
+              <EmptyContent onClick={this.handleOpen}>
                 {intl.formatMessage(messages['profile.position.empty'])}
               </EmptyContent>
             </>
@@ -138,7 +136,6 @@ Position.propTypes = {
   closeHandler: PropTypes.func.isRequired,
   openHandler: PropTypes.func.isRequired,
   intl: intlShape.isRequired,
-  isAuthenticatedUserProfile: PropTypes.bool,
 };
 
 Position.defaultProps = {
@@ -147,15 +144,9 @@ Position.defaultProps = {
   position: null,
   visibilityPosition: 'private',
   error: null,
-  isAuthenticatedUserProfile: false,
 };
 
-const mapStateToProps = (state, ownProps) => ({
-  ...editableFormSelector(state, ownProps),
-  isAuthenticatedUserProfile: state.profilePage.isAuthenticatedUserProfile,
-});
-
 export default connect(
-  mapStateToProps,
+  editableFormSelector,
   {},
 )(injectIntl(Position));

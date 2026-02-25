@@ -295,6 +295,7 @@ class ProfilePage extends React.Component {
                 position={position}
                 visibilityPosition={visibilityPosition}
                 formId="position"
+                cashbackUserId={this.props.cashbackUserId}
                 {...commonFormProps}
               />
             )}
@@ -388,6 +389,7 @@ ProfilePage.propTypes = {
   requiresParentalConsent: PropTypes.bool,
   dateJoined: PropTypes.string,
   username: PropTypes.string,
+  cashbackUserId: PropTypes.bool,
 
   // Bio form data
   bio: PropTypes.string,
@@ -495,6 +497,7 @@ ProfilePage.defaultProps = {
   country: null,
   city: null,
   position: null,
+  cashbackUserId: null,
   companyName: null,
   socialLinks: [],
   draftSocialLinksByPlatform: {},

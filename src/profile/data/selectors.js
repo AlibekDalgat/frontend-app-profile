@@ -379,6 +379,7 @@ export const profilePageSelector = createSelector(
     requiresParentalConsent: account.requiresParentalConsent,
     dateJoined: account.dateJoined,
     yearOfBirth: account.yearOfBirth,
+    cashbackUserId: account.cashbackUserId,
 
     // Bio form data
     bio: formValues.bio,
