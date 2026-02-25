@@ -127,6 +127,7 @@ export function* handleSaveProfile(action) {
       'socialLinks',
       'city',
       'companyName',
+      'position',
     ]);
 
     const preferencesDrafts = pick(drafts, [
@@ -143,12 +144,6 @@ export function* handleSaveProfile(action) {
       'visibilityCompanyName',
     ]);
 
-    if (accountDrafts.position) {
-      delete accountDrafts.position;
-      if (drafts.visibilityPosition) {
-        preferencesDrafts.visibilityPosition = drafts.visibilityPosition;
-      }
-    }
 
     if (Object.keys(preferencesDrafts).length > 0) {
       preferencesDrafts.accountPrivacy = 'custom';

@@ -6,3 +6,21 @@
 @import "~@edx/frontend-component-footer/dist/footer";
 
 @import './profile/index';
+
+.app-header-fixed {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.app-footer {
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .app-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 1000;
+  }
+}

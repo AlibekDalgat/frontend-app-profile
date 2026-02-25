@@ -33,12 +33,15 @@ subscribe(APP_READY, () => {
   rootNode.render(
     <StrictMode>
       <AppProvider store={configureStore()}>
-        <Head />
-        <ProfileHeader />
+        <div className="app-header-fixed">
+          <ProfileHeader />
+        </div>
         <main id="main">
           <AppRoutes />
         </main>
-        <CustomFooter />
+        <div className="app-footer">
+          <CustomFooter />
+        </div>
       </AppProvider>
     </StrictMode>,
   );
