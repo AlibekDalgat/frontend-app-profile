@@ -308,7 +308,7 @@ export default defineMessages({
   },
   'actionType.points_threshold': {
     id: 'rewards.actionType.points_threshold',
-    defaultMessage: 'Прохождение порога',
+    defaultMessage: 'Преодоление проходной награды',
   },
   'actionType.first_completion': {
     id: 'rewards.actionType.first_completion',
@@ -318,5 +318,43 @@ export default defineMessages({
     id: 'rewards.deletedOrUnavailableBlockName',
     defaultMessage: 'Блок удалён или недоступен',
      description: 'Показывается в названии блока, когда block_type = unknown',
+  },
+
+  'type.earned': {
+    id: 'profile.rewards.type.earned',
+    defaultMessage: 'Получено',
+  },
+  'type.spent': {
+    id: 'profile.rewards.type.spent',
+    defaultMessage: 'Списано',
+  },
+  'type.earned_referrer': {
+    id: 'profile.rewards.type.earned_referrer',
+    defaultMessage: 'Получено от приглашённого',
+  },
+  'type.earned_referee': {
+    id: 'profile.rewards.type.earned_referee',
+    defaultMessage: 'Получено от пригласившего',
+  },
+  noEvents: {
+    id: 'profile.rewards.noEvents',
+    defaultMessage: 'Нет событий в истории',
+  },
+  noEvents: { defaultMessage: 'Нет событий в истории' },
+  courseLabel: {
+    id: 'profile.rewards.courseLabel',
+    defaultMessage: 'Курс',
+  },
+  userLabel: {
+    id: 'profile.rewards.userLabel',
+    defaultMessage: 'Пользователь',
+  },
+  descriptionLabel: {
+    id: 'profile.rewards.descriptionLabel',
+    defaultMessage: 'Описание',
+  },
+  noDescription: {
+    id: 'profile.rewards.noDescription',
+    defaultMessage: 'Нет описания',
   },
 });

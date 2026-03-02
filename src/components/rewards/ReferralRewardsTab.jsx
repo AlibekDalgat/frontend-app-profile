@@ -7,7 +7,8 @@ import {
   Spinner,
   Alert,
   OverlayTrigger,
-  Tooltip
+  Tooltip,
+  Pagination,
 } from '@openedx/paragon';
 import { injectIntl } from 'react-intl';
 import { ContentCopy, InfoOutline } from '@openedx/paragon/icons';
@@ -22,90 +23,71 @@ const getActionTypeDisplayName = (actionType, intl) => {
   return message ? intl.formatMessage(message) : actionType;
 };
 
-const UserAccordion = ({ userRef, intl }) => {
+const getEventTypeDisplayName = (eventType, intl) => {
+  const message = messages[`type.${eventType}`];
+  return message ? intl.formatMessage(message) : eventType;
+};
+
+const ReferralEventAccordion = ({ event, intl }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const {
-    username = intl.formatMessage(messages.fallbackUsername),
-    total_earned = 0,
-    total_spent = 0,
-    total_balance = 0,
-    actions = [],
-    isInviter = false,
-  } = userRef;
+  const { type, time, points, details } = event;
+  const isEarned = type.startsWith('earned_');
+  const sign = isEarned ? '+' : '-';
+  const colorClass = isEarned ? 'text-success' : 'text-danger';
 
   return (
     <>
       <div
-        className={`d-flex flex-column flex-md-row justify-content-between align-items-start px-4 py-3 bg-white cursor-pointer border-top`}
+        className="d-flex justify-content-between align-items-start px-3 py-3 bg-white cursor-pointer border-top flex-wrap flex-md-nowrap"
         onClick={() => setIsOpen(!isOpen)}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsOpen(!isOpen)}
       >
-        <div className={`d-flex align-items-center`}>
-          <div className="fw-bold fs-5 text-break">
-            {username}
-            {isInviter && <Badge bg="primary" className="mx-1">{intl.formatMessage(messages.inviterBadge)}</Badge>}
+        <div className="d-flex flex-column me-3 flex-grow-1">
+          <div className="fw-bold event-status-text">
+            {getEventTypeDisplayName(type, intl)}
+          </div>
+          <div className="text-muted small mt-1">
+            {new Date(time).toLocaleString('ru-RU', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
+            })}
           </div>
         </div>
 
-        <div className={`d-flex align-items-center text-nowrap mt-3 mt-md-0`}>
-          <div className="me-3">
-            <span className="d-block small text-muted">{intl.formatMessage(messages.earnedLabel)}</span>
-            <strong>{total_earned}</strong>
+        <div className="d-flex align-items-center flex-shrink-0">
+          <div
+            className={`fw-bold ${colorClass} text-end me-3`}
+            style={{ minWidth: '70px' }}
+          >
+            {sign}{Math.abs(points)}
           </div>
-          <div className="mx-3">
-            <span className="d-block small text-muted">{intl.formatMessage(messages.availableLabel)}</span>
-            <strong className={total_balance > 0 ? 'text-success' : ''}>{total_balance}</strong>
-          </div>
-          <div className="mx-3">
-            <span className="d-block small text-muted">{intl.formatMessage(messages.spentLabel)}</span>
-            <strong>{total_spent}</strong>
-          </div>
-          <div className="ms-3 fs-4 fw-bold">{isOpen ? '▲' : '▼'}</div>
+
+          <div className="fs-5 fw-bold"> {isOpen ? '▲' : '▼'} </div>
         </div>
       </div>
 
       {isOpen && (
-        <div className={`px-5 py-4 border-top`}>
-          {actions.length === 0 ? (
-            <div className="text-muted py-2">{intl.formatMessage(messages.noActions)}</div>
+        <div className={`px-5 py-4 border-top bg-light`}>
+          {isEarned ? (
+            <>
+              <div className="mb-2">
+                <strong>{type === 'earned_referrer'
+                  ? intl.formatMessage({ id: 'rewards.refereeLabel', defaultMessage: 'Приглашённый' })
+                  : intl.formatMessage({ id: 'rewards.referrerLabel', defaultMessage: 'Пригласил' })}:</strong>{' '}
+                {details.referee_username || details.referrer_username || '—'}
+              </div>
+              <div className="mb-2">
+                <strong>{intl.formatMessage(messages.actionHeader)}:</strong>{' '}
+                {getActionTypeDisplayName(details.action, intl)}
+              </div>
+            </>
           ) : (
-            <div className="table-responsive">
-              <table className={`table table-sm table-hover mb-0`}>
-                <thead className="table-light">
-                  <tr>
-                    <th>{intl.formatMessage(messages.actionHeader)}</th>
-                    <th className="text-end">{intl.formatMessage(messages.pointsHeader)}</th>
-                    <th>{intl.formatMessage(messages.statusHeader)}</th>
-                    <th>{intl.formatMessage(messages.earnedDateHeader)}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {actions.map((action, idx) => (
-                    <tr key={idx}>
-                      <td>{getActionTypeDisplayName(action.action, intl)}</td>
-                      <td className="text-end">{action.points}</td>
-                      <td>
-                        {action.spent ? (
-                          <span className="text-danger">
-                            {intl.formatMessage(messages.statusSpent)} {action.spent_at ? `(${new Date(action.spent_at).toLocaleString('ru-RU')})` : ''}
-                          </span>
-                        ) : (
-                          <span className="text-success fw-bold">{intl.formatMessage(messages.statusAvailable)}</span>
-                        )}
-                      </td>
-                      <td>
-                        {new Date(action.earned_at).toLocaleString('ru-RU', {
-                          dateStyle: 'medium',
-                          timeStyle: 'short',
-                        })}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div>
+              <strong>{intl.formatMessage({ id: 'rewards.descriptionLabel', defaultMessage: 'Описание' })}:</strong>{' '}
+              {details.description || intl.formatMessage({ id: 'rewards.noDescription', defaultMessage: 'Нет описания' })}
             </div>
           )}
         </div>
@@ -117,7 +99,11 @@ const UserAccordion = ({ userRef, intl }) => {
 const OrganizationAccordion = ({ organization, onParticipateToggle, onParticipateRatingToggle, onInviteClick, intl }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [toggling, setToggling] = useState(false);
-
+  const [events, setEvents] = useState(organization.events || []);
+  const [currentPage, setCurrentPage] = useState(organization.page || 1);
+  const [totalEvents, setTotalEvents] = useState(organization.total_events || 0);
+  const [perPage] = useState(organization.per_page || 20);
+  const [loadingEvents, setLoadingEvents] = useState(false);
   const {
     id,
     name,
@@ -130,6 +116,29 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, onParticipat
     user_referral_active = false,
     participate_in_rating = false,
   } = organization;
+
+  const loadEventsPage = async (page) => {
+    setLoadingEvents(true);
+    try {
+      const response = await fetchReferralHistory(id, page, perPage);
+      const updatedOrg = response.data.organizations.find(o => o.id === id);
+      if (updatedOrg) {
+        setEvents(updatedOrg.events || []);
+        setCurrentPage(updatedOrg.page || page);
+        setTotalEvents(updatedOrg.total_events || 0);
+      }
+    } catch (err) {
+      console.error('Ошибка загрузки страницы событий:', err);
+    } finally {
+      setLoadingEvents(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && events.length === 0 && totalEvents > 0) {
+      loadEventsPage(1);
+    }
+  }, [isOpen]);
 
   const handleSwitchChange = async (e) => {
     const newValue = e.target.checked;
@@ -257,12 +266,39 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, onParticipat
 
       {isOpen && (
         <div className="border-top">
-          {allUsers.length > 0 ? (
-            allUsers.map((userRef) => (
-              <UserAccordion key={userRef.username} userRef={userRef} intl={intl} />
-            ))
+          {loadingEvents ? (
+            <div className="p-4 text-center">
+              <Spinner animation="border" size="sm" />
+            </div>
+          ) : events.length > 0 ? (
+            <>
+              {events.map((event, index) => (
+                <ReferralEventAccordion
+                  key={index}
+                  event={event}
+                  intl={intl}
+                />
+              ))}
+
+              {totalEvents > perPage && (
+                <div className="p-4 d-flex justify-content-center">
+                  <Pagination
+                    paginationLabel="реферальная история"
+                    pageCount={Math.ceil(totalEvents / perPage)}
+                    currentPage={currentPage}
+                    onPageSelect={(newPage) => {
+                      setCurrentPage(newPage);
+                      loadEventsPage(newPage);
+                    }}
+                    variant="canonical"
+                  />
+                </div>
+              )}
+            </>
           ) : (
-            <div className="p-4 text-muted">{intl.formatMessage(messages.noReferralInteractions)}</div>
+            <div className="p-4 text-muted">
+              {intl.formatMessage(messages.noEvents || { defaultMessage: 'Нет событий в истории' })}
+            </div>
           )}
         </div>
       )}

@@ -15,3 +15,9 @@
 .table thead th {
     vertical-align: top;
 }
+
+@media (max-width: 576px) {
+  .event-status-text {
+    font-size: 1rem;
+  }
+}
