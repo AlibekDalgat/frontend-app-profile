@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Spinner, Alert, Badge, Form, OverlayTrigger, Tooltip } from '@openedx/paragon';
+import { Container, Spinner, Alert, Badge, Form, OverlayTrigger, Tooltip, Pagination } from '@openedx/paragon';
 import { injectIntl } from 'react-intl';
 import { InfoOutline } from '@openedx/paragon/icons';
 
@@ -10,6 +10,11 @@ import { fetchRewardsHistory, toggleParticipateInRating } from './data/api';
 const getBlockTypeDisplayName = (blockType, intl) => {
   const message = messages[`blockType.${blockType}`];
   return message ? intl.formatMessage(message) : blockType;
+};
+
+const getEventTypeDisplayName = (eventType, intl) => {
+  const message = messages[`type.${eventType}`];
+  return message ? intl.formatMessage(message) : eventType;
 };
 
 const RewardsTab = ({ intl }) => {
@@ -66,6 +71,11 @@ const RewardsTab = ({ intl }) => {
 const OrganizationAccordion = ({ organization, onParticipateToggle, intl }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [toggling, setToggling] = useState(false);
+  const [events, setEvents] = useState(organization.events || []);
+  const [currentPage, setCurrentPage] = useState(organization.page || 1);
+  const [totalEvents, setTotalEvents] = useState(organization.total_events || 0);
+  const [perPage] = useState(organization.per_page || 20);
+  const [loadingEvents, setLoadingEvents] = useState(false);
 
   const {
     id,
@@ -78,6 +88,29 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, intl }) => {
     participate_in_rating = false,
     rating_enabled = false,
   } = organization;
+
+  const loadEventsPage = async (page) => {
+    setLoadingEvents(true);
+    try {
+      const response = await fetchRewardsHistory(id, page, perPage);
+      const updatedOrg = response.data.organizations.find(o => o.id === id);
+      if (updatedOrg) {
+        setEvents(updatedOrg.events || []);
+        setCurrentPage(updatedOrg.page || page);
+        setTotalEvents(updatedOrg.total_events || 0);
+      }
+    } catch (err) {
+      console.error('Ошибка загрузки страницы событий:', err);
+    } finally {
+      setLoadingEvents(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && events.length === 0 && totalEvents > 0) {
+      loadEventsPage(1);
+    }
+  }, [isOpen]);
 
   const handleSwitchChange = async (e) => {
     const newValue = e.target.checked;
@@ -158,12 +191,37 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, intl }) => {
 
       {isOpen && (
         <div className="border-top">
-          {courses?.length ? (
-            courses.map((course) => (
-              <CourseAccordion key={course.id} course={course} intl={intl} />
-            ))
+          {loadingEvents ? (
+            <div className="p-4 text-center">
+              <Spinner animation="border" size="sm" />
+            </div>
+          ) : events.length > 0 ? (
+            <>
+              {events.map((event, index) => (
+                <EventAccordion
+                  key={index}
+                  event={event}
+                  intl={intl}
+                />
+              ))}
+
+              {totalEvents > perPage && (
+                <div className="p-4 d-flex justify-content-center">
+                  <Pagination
+                    paginationLabel="история наград"
+                    pageCount={Math.ceil(totalEvents / perPage)}
+                    currentPage={currentPage}
+                    onPageSelect={(newPage) => {
+                      setCurrentPage(newPage);
+                      loadEventsPage(newPage);
+                    }}
+                    variant="canonical"
+                  />
+                </div>
+              )}
+            </>
           ) : (
-            <div className="p-4 text-muted">{intl.formatMessage(messages.noCoursesWithRewards)}</div>
+            <div className="p-4 text-muted">{intl.formatMessage(messages.noEvents)}</div>
           )}
         </div>
       )}
@@ -171,103 +229,70 @@ const OrganizationAccordion = ({ organization, onParticipateToggle, intl }) => {
   );
 };
 
-const CourseAccordion = ({ course, intl }) => {
+const EventAccordion = ({ event, intl }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const {
-    display_name = intl.formatMessage(messages.fallbackCourseName),
-    number = '',
-    total_earned = 0,
-    total_spent = 0,
-    total_balance = 0,
-    blocks = [],
-  } = course;
+  const { type, time, points, details } = event;
+  const isEarned = type === 'earned';
+  const sign = isEarned ? '+' : '-';
+  const colorClass = isEarned ? 'text-success' : 'text-danger';
 
   return (
     <>
       <div
-        className={`d-flex flex-column flex-md-row justify-content-between align-items-start px-4 py-3 bg-white cursor-pointer border-top`}
+        className="d-flex justify-content-between align-items-start px-3 py-3 bg-white cursor-pointer border-top flex-wrap flex-md-nowrap"
         onClick={() => setIsOpen(!isOpen)}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsOpen(!isOpen)}
       >
-        <div className={`d-flex align-items-center`}>
-          <div className="fw-bold fs-5 text-break">{display_name}</div>
-          {number && (
-            <>
-              <span className="mx-1">&nbsp;</span>
-              <Badge bg="secondary">
-                {number}
-              </Badge>
-            </>
-          )}
+        <div className="d-flex flex-column me-md-4 flex-grow-1">
+          <div className="fw-bold fs-5">
+            {getEventTypeDisplayName(type, intl)}
+          </div>
+          <div className="text-muted small mt-1">
+            {new Date(time).toLocaleString('ru-RU', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
+            })}
+          </div>
         </div>
 
-        <div className={`d-flex align-items-center text-nowrap mt-3 mt-md-0`}>
-          <div className="me-3">
-            <span className="d-block small text-muted">{intl.formatMessage(messages.earnedLabel)}</span>
-            <strong>{total_earned}</strong>
+        <div className="d-flex align-items-center flex-shrink-0">
+          <div
+            className={`fw-bold ${colorClass} text-end me-3`}
+            style={{ minWidth: '70px' }}
+          >
+            {sign}{Math.abs(points)}
           </div>
-          <div className="mx-3">
-            <span className="d-block small text-muted">{intl.formatMessage(messages.availableLabel)}</span>
-            <strong className={total_balance > 0 ? 'text-success' : ''}>
-              {total_balance}
-            </strong>
-          </div>
-          <div className="mx-3">
-            <span className="d-block small text-muted">{intl.formatMessage(messages.spentLabel)}</span>
-            <strong>{total_spent}</strong>
-          </div>
-          <div className="ms-3 fs-4 fw-bold">{isOpen ? '▲' : '▼'}</div>
+
+          <div className="fs-4 fw-bold"> {isOpen ? '▲' : '▼'} </div>
         </div>
       </div>
 
       {isOpen && (
-        <div className={`px-5 py-4 border-top`}>
-          {blocks.length === 0 ? (
-            <div className="text-muted py-2">{intl.formatMessage(messages.noBlockRewards)}</div>
+        <div className={`px-5 py-4 border-top bg-light`}>
+          {isEarned ? (
+            <>
+              <div className="mb-2">
+                <strong>{intl.formatMessage(messages.courseLabel || { defaultMessage: 'Курс' })}:</strong>{' '}
+                {details.course_name}
+              </div>
+              <div className="mb-2">
+                <strong>{intl.formatMessage(messages.blockNameHeader)}:</strong>{' '}
+                {details.block_name === "Deleted or unavailable content"
+                  ? intl.formatMessage(messages.deletedOrUnavailableBlockName)
+                  : (details.block_name || '—')}
+              </div>
+              <div>
+                <strong>{intl.formatMessage(messages.blockTypeHeader)}:</strong>{' '}
+                {getBlockTypeDisplayName(details.block_type, intl)}
+              </div>
+            </>
           ) : (
-            <div className="table-responsive">
-              <table className={`table table-sm table-hover mb-0`}>
-                <thead className="table-light">
-                  <tr>
-                    <th>{intl.formatMessage(messages.blockNameHeader)}</th>
-                    <th>{intl.formatMessage(messages.blockTypeHeader)}</th>
-                    <th className="text-end">{intl.formatMessage(messages.rewardsHeader)}</th>
-                    <th>{intl.formatMessage(messages.statusHeader)}</th>
-                    <th>{intl.formatMessage(messages.earnedDateHeader)}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {blocks.map((block) => (
-                    <tr key={block.block_id}>
-                      <td className="fw-medium">
-                        {block.block_type === 'unknown'
-                          ? intl.formatMessage(messages.deletedOrUnavailableBlockName)
-                          : (block.block_name?.trim() || '—')}
-                      </td>
-                      <td>{getBlockTypeDisplayName(block.block_type, intl)}</td>
-                      <td className="text-end">{block.points}</td>
-                      <td>
-                        {block.spent ? (
-                          <span className="text-danger">
-                            {intl.formatMessage(messages.statusSpent)} {block.spent_at ? `(${new Date(block.spent_at).toLocaleString('ru-RU')})` : ''}
-                          </span>
-                        ) : (
-                          <span className="text-success fw-bold">{intl.formatMessage(messages.statusAvailable)}</span>
-                        )}
-                      </td>
-                      <td>
-                        {new Date(block.earned_at).toLocaleString('ru-RU', {
-                          dateStyle: 'medium',
-                          timeStyle: 'short',
-                        })}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div>
+              <strong>{intl.formatMessage({ id: 'rewards.descriptionLabel', defaultMessage: 'Описание' })}:</strong>{' '}
+              {details.description || intl.formatMessage({ id: 'rewards.noDescription', defaultMessage: 'Нет описания' })}
             </div>
           )}
         </div>
