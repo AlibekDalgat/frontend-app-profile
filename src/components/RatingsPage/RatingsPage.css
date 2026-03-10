@@ -23,5 +23,5 @@
 }
 
 .nav-pills .nav-link.active {
-  background-color: #2F2F60;
+  background-color: var(--primary);
 }
