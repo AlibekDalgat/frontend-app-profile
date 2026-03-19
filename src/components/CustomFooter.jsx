@@ -1,9 +1,17 @@
 import React, { useContext } from 'react';
 import { AppContext } from '@edx/frontend-platform/react';
 import { Hyperlink } from '@openedx/paragon';
+import { getConfig } from '@edx/frontend-platform';
 
 const CustomFooter = () => {
   const { config } = useContext(AppContext);
+  const mfeConfig = getConfig();
+
+  const logoSrc = mfeConfig.WIDGET_MODE && mfeConfig.WIDGET_LOGO_URL
+    ? mfeConfig.WIDGET_LOGO_URL
+    : `${config.LMS_BASE_URL}/static/images/logo.png`;
+
+  const logoAlt = `${mfeConfig.SITE_NAME} logo`
 
   return (
     <footer style={{
@@ -18,8 +26,8 @@ const CustomFooter = () => {
     }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
         <img
-          src={config.LMS_BASE_URL + "/static/images/logo.png"}
-          alt="ProfilUp logo"
+          src={logoSrc}
+          alt={logoAlt}
           style={{ height: '40px', width: 'auto' }}
         />
         <span style={{ color: '#6c757d', fontSize: '12px' }}>

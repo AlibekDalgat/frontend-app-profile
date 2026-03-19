@@ -13,7 +13,7 @@
   &:hover, &:focus, &.active, .expanded & {
     background: transparent !important;
     color: var(--pgn-color-neutral-900) !important;
-    border-bottom-color: #2F2F60 !important;
+    border-bottom-color: var(--primary) !important;
   }
 }
 
@@ -32,8 +32,8 @@
 }
 
 .btn-outline-primary {
-    color: #2F2F60 !important;
-    border-color: #2F2F60 !important;
+    color: var(--primary) !important;
+    border-color: var(--primary) !important;
 }
 
 .site-header-desktop,

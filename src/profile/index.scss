@@ -1,7 +1,5 @@
 $text-color: $gray-800 !default;
 $text-color-primary: $gray-700 !default;
-$primary: #2F2F60;
-$primary-light: #EDE8F5 !default;
 
 .word-break-all {
   word-break: break-all !important;
@@ -48,8 +46,8 @@ $primary-light: #EDE8F5 !default;
     height: 12rem;
     background: radial-gradient(
       circle at 30% 40%,
-      lighten($primary, 50%) 0%,
-      $primary-light 70%
+      color-mix(in srgb, var(--primary), white 50%),
+      var(--primary-light) 70%
     ) !important;
     position: relative;
     overflow: hidden;
@@ -145,13 +143,13 @@ $primary-light: #EDE8F5 !default;
           box-shadow: none;
           border-radius: 8px;
           padding: 15px;
-          background: $primary-light;
+          background: var(--primary-light);
           color: $text-color;
           font-size: 14px;
           line-height: 20px;
           
           a {
-            color: $primary;
+            color: var(--primary);
           }
           
           .alert-heading.h4 {
@@ -173,7 +171,7 @@ $primary-light: #EDE8F5 !default;
       
       .pgn-transition-replace-group {
         border: 1px solid #E5E7EB;
-        border-left: 8px solid $primary-light;
+        border-left: 8px solid var(--primary-light);
         padding: 15px !important;
         margin: 0 0 15px !important;
         border-radius: 8px;
@@ -194,7 +192,7 @@ $primary-light: #EDE8F5 !default;
           .certificate {
             border: none;
             padding: 0;
-            background: $primary-light;
+            background: var(--primary-light);
             margin: 0 !important;
           }
           
@@ -203,13 +201,13 @@ $primary-light: #EDE8F5 !default;
             
             a.default-link {
               padding: 7px 13px !important;
-              border: 1px solid $primary !important;
-              color: $primary;
+              border: 1px solid var(--primary) !important;
+              color: var(--primary);
               text-decoration: none;
               font-size: 0;
               line-height: 0;
               margin: 0 !important;
-              background: $primary;
+              background: var(--primary);
               position: absolute;
               top: 15px;
               right: 15px;
@@ -270,7 +268,7 @@ $primary-light: #EDE8F5 !default;
         }
         
         small.form-text {
-          background: $primary-light;
+          background: var(--primary-light);
           padding: 10px 15px;
           border-radius: 6px;
           font-size: 14px;
@@ -284,7 +282,7 @@ $primary-light: #EDE8F5 !default;
           
           button {
             padding: 7px 13px !important;
-            border: 1px solid $primary !important;
+            border: 1px solid var(--primary) !important;
             color: #fff;
             text-decoration: none;
             font-size: 14px;
@@ -294,7 +292,7 @@ $primary-light: #EDE8F5 !default;
             position: absolute;
             right: 15px;
             top: 15px;
-            background: $primary;
+            background: var(--primary);
             outline-offset: 3px;
             
             svg {
@@ -360,7 +358,7 @@ $primary-light: #EDE8F5 !default;
                 line-height: 20px;
                 border: none !important;
                 padding: 0 !important;
-                color: $primary !important;
+                color: var(--primary) !important;
                 text-decoration: underline;
                 
                 &:after {
@@ -369,7 +367,7 @@ $primary-light: #EDE8F5 !default;
               }
               
               a {
-                color: $primary;
+                color: var(--primary);
                 font-size: 16px;
                 font-weight: 600;
                 line-height: 20px;
@@ -412,14 +410,14 @@ $primary-light: #EDE8F5 !default;
             
             button {
               padding: 7px 13px !important;
-              border: 1px solid $primary !important;
+              border: 1px solid var(--primary) !important;
               color: #fff;
               text-decoration: none;
               font-size: 14px;
               font-weight: 500;
               line-height: 20px;
               margin: 0 0 0 15px !important;
-              background: $primary;
+              background: var(--primary);
               
               &.btn-link {
                 background: #fff !important;
@@ -446,7 +444,7 @@ $primary-light: #EDE8F5 !default;
   
   .profile-avatar {
     svg.text-muted {
-      color: $primary !important;
+      color: var(--primary) !important;
     }
     
     width: 5rem;
@@ -566,4 +564,43 @@ $primary-light: #EDE8F5 !default;
 .icon-visibility-off {
   height: 1rem;
   color: $gray-500;
+}
+
+.site-header-desktop,
+.site-header-mobile {
+  position: relative !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+  background: var(--pgn-color-white, white);
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+[data-widget-mode="true"] header .logo,
+[data-widget-mode="true"] .site-header .logo,
+[data-widget-mode="true"] .site-header-mobile .logo {
+  background-image: var(--widget-logo-url, none) !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+
+  width: 80px !important;
+  height: 40px !important;
+  min-height: 20px !important;
+
+  position: relative !important;
+  top: 0 !important;
+  margin-right: 1rem !important;
+}
+
+[data-widget-mode="true"] header .logo img,
+[data-widget-mode="true"] .site-header .logo img,
+[data-widget-mode="true"] .site-header-mobile .logo img {
+  display: none !important;
+}
+
+[data-widget-mode="true"] header .logo {
+  display: flex !important;
+  align-items: center !important;
 }
