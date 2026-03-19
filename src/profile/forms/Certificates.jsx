@@ -146,6 +146,9 @@ class Certificates extends React.Component {
                   headingId="course-certificates-label"
                   content={intl.formatMessage(messages['profile.certificates.my.certificates'])}
                 />
+                <div className="mb-3">
+                  {this.renderCertificates()}
+                </div>
                 <FormControls
                   visibilityId="visibilityCourseCertificates"
                   saveState={saveState}
@@ -153,7 +156,6 @@ class Certificates extends React.Component {
                   cancelHandler={this.handleClose}
                   changeHandler={this.handleChange}
                 />
-                {this.renderCertificates()}
               </form>
             </div>
           ),
