@@ -14,6 +14,12 @@ const getProfileHeaderMenu = (formatMessage, catalogUrl, authenticatedUser) => (
       href: catalogUrl.startsWith('http') ? catalogUrl : `${getConfig().LMS_BASE_URL}${catalogUrl}`,
       content: formatMessage(messages.catalog),
     },
+    ...(getConfig().ENABLE_AI_ASSISTANT_WIDGET ? [{
+      type: 'item',
+      href: `${getConfig().LEARNER_HOME_BASE_URL}ai-assistant`,
+      content: formatMessage(messages.aiAssis),
+      isActive: window.location.pathname.includes('/ai-assistant'),
+    }] : []),
     {
       type: 'item',
       href: `${getConfig().ACCOUNT_PROFILE_URL}/ratings`,
